@@ -1,4 +1,4 @@
-﻿<Window  
+<Window  
     x:Class="WpfApp1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,14 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:WpfApp1"
         xmlns:local="clr-namespace:WpfApp1"
-        xmlns:converter="clr-namespace:System.Windows" 
+        xmlns:converter="clr-namespace:System.Windows"
         d:DataContext="{d:DesignInstance Type=vm:WindowViewModel}"
         MouseDown="Window_MouseDown"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         WindowStyle="SingleBorderWindow"
         MinWidth="600"
-        MinHeight="450"
+        MinHeight="500"
         ResizeMode="CanResizeWithGrip"
         x:Name="AppWindow" 
         Icon="Resources/logo.png"
@@ -28,6 +28,28 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="./Styles/Fonts.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBox">
+                <Setter Property="ToolTipService.ShowDuration" Value="5000"/>
+                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
+                <Setter Property="ToolTipService.HasDropShadow" Value="True"/>
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="true">
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                        <Setter Property="Foreground" Value="Red"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="DataGridCell">
+                <Setter Property="ToolTipService.ShowDuration" Value="5000"/>
+                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
+                <Setter Property="ToolTipService.HasDropShadow" Value="True"/>
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="true">
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                        <Setter Property="Foreground" Value="Red"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
             <converter:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
             <converter:InverseBooleanToVisibilityConverter x:Key="inversebooleanToVisibilityConverter"/>
         </ResourceDictionary>
@@ -110,7 +132,7 @@
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="10"/>
@@ -118,7 +140,7 @@
 
                 <!--User Inputs-->
                 <GroupBox Grid.Column="1" Header="Properties" FontWeight="DemiBold" BorderBrush="#D76F30">
-                    <Grid>
+                    <Grid x:Name="UserInputs">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="20"/>
@@ -146,18 +168,18 @@
 
                         <!--Labels for rectangular sections-->
                         <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                           Grid.Row="2" Grid.Column="0" Content="Width" FontWeight="Bold"/>
+                           Grid.Row="2" Grid.Column="0" Content="Width (mm)" FontWeight="Bold"/>
                         <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                           Grid.Row="3" Grid.Column="0" Content="Height" FontWeight="Bold"/>
+                           Grid.Row="3" Grid.Column="0" Content="Height (mm)" FontWeight="Bold"/>
                         <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                            Grid.Row="5" Grid.Column="0" Content="Side Cover" FontWeight="Bold"/>
+                            Grid.Row="5" Grid.Column="0" Content="Side Cover (mm)" FontWeight="Bold"/>
 
                         <!--Labels for circular sections-->
 
                         <Label FontFamily="{StaticResource ArchDaughter}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" 
-                            Grid.Row="2" Grid.Column="0" Content="Radius" FontWeight="Bold"/>
+                            Grid.Row="2" Grid.Column="0" Content="Radius (mm)" FontWeight="Bold"/>
                         <Label FontFamily="{StaticResource ArchDaughter}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" 
-                            Grid.Row="3" Grid.Column="0" Content="Diameter" FontWeight="Bold"/>
+                            Grid.Row="3" Grid.Column="0" Content="Diameter (mm)" FontWeight="Bold"/>
 
                         <!-- Alternate Style
 
@@ -165,7 +187,7 @@
                                 Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Content="Radius" FontWeight="Bold" Margin="0,15,0,15"/>
                      -->
 
-                        <Label FontFamily="{StaticResource ProductSans}" Grid.Row="4" Grid.Column="0" Content="Cover" FontWeight="Bold"/>
+                        <Label FontFamily="{StaticResource ProductSans}" Grid.Row="4" Grid.Column="0" Content="Cover (mm)" FontWeight="Bold"/>
 
                         <Grid Grid.Row="8" Grid.Column="0" Grid.RowSpan="5">
 
@@ -182,28 +204,31 @@
                             </Grid.RowDefinitions>
 
 
-                            <TextBlock FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" Text="Rebar A" FontWeight="ExtraBold"/>
-                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Rebar
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" FontWeight="Bold">
+                                Rebar Area (mm<Run FontSize="7pt" BaselineAlignment="TextTop">2</Run>)
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Rebar
                             I<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
+                            (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
                             </TextBlock>
-                            <TextBlock Grid.Row="2" FontFamily="{StaticResource ParadiseLove}" Grid.Column="0" FontWeight="Bold"> Rebar
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" FontFamily="{StaticResource ParadiseLove}" Grid.Column="0" FontWeight="Bold"> Rebar
                             I<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
+                            (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
                             </TextBlock>
-                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Rebar
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Rebar
+                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run> (mm)
                             </TextBlock>
-                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Rebar
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Rebar
+                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run> (mm)
                             </TextBlock>
 
 
-                            <TextBlock x:Name="RA" Text ="{Binding Centroid}" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
+                            <TextBox x:Name="RA" IsReadOnly="True" Text ="{Binding AreaOfRebars}" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
                                 Background="#EFEFEF" Padding="5" Margin="0 2 0 2"/>
-                            <TextBlock x:Name="RIY" Text="{Binding RebarIx}" Grid.Row="1" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="RIX" Text="{Binding RebarIy}" Grid.Row="2" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="RRX" Text="{Binding RebarRx}" Grid.Row="3" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="RRY" Text="{Binding RebarRy}" Grid.Row="4" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-
+                            <TextBox x:Name="RIY" IsReadOnly="True" Text="{Binding RebarIx}" Grid.Row="1" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
+                            <TextBox x:Name="RIX" IsReadOnly="True" Text="{Binding RebarIy}" Grid.Row="2" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" />
+                            <TextBox x:Name="RRX" IsReadOnly="True" Text="{Binding RebarRadiusX}" Grid.Row="3" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
+                            <TextBox x:Name="RRY" IsReadOnly="True" Text="{Binding RebarRadiusY}" Grid.Row="4" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
 
                         </Grid>
 
@@ -222,15 +247,21 @@
 
                             <DataGrid.Resources>
                                 <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#EFEFEF"/>
+                                    <Setter Property="Background" Value="#A7BC5B"/>
                                 </Style>
                             </DataGrid.Resources>
                             <DataGrid.ColumnHeaderStyle>
                                 <StaticResource ResourceKey="ColumnHeaderStyle" />
                             </DataGrid.ColumnHeaderStyle>
-
+                            
+                            <!--Row Number-->
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Row" Width="*" IsReadOnly="True" Binding="{Binding Count}">
+                                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Count, ValidatesOnDataErrors=True}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                            <TextBlock Padding="5" Text="Row" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataGridTextColumn.Header>
                                     <DataGridTextColumn.CellStyle>
                                         <Style TargetType="DataGridCell">
                                             <Setter Property="Background" Value="#EFEFEF" />
@@ -239,9 +270,37 @@
                                     </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
 
-                                <DataGridTextColumn Header="R Diameter" Binding="{Binding Dia}" Width="2*"/>
-                                <DataGridTextColumn Header="Number" Binding="{Binding Num}" Width="2*"/>
-                                <DataGridTextColumn Header="Delta Y" Binding="{Binding DeltaY}" Width="2*"/>
+                                <!--Rebar Diameter-->
+                                <DataGridTextColumn Binding="{Binding Dia, ValidatesOnDataErrors=True}" Width="100">
+                                    <DataGridTextColumn.Header>
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                            <TextBlock Text="Rebar Diameter" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="(mm&#x00B2;)" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                   
+
+                                <!--Number of Rebars-->
+                                <DataGridTextColumn Binding="{Binding Num, ValidatesOnDataErrors=True}" Width="100">
+                                    <DataGridTextColumn.Header>
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                            <TextBlock Text="Number of" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Rebars" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+
+                                <!--Delta Y or Spacing or chuck-->
+                                <DataGridTextColumn Binding="{Binding DeltaY, ValidatesOnDataErrors=True}" Width="*">
+                                    <DataGridTextColumn.Header>
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                            <TextBlock Text="Delta Y" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+
+                                <!--Delete-->
                                 <DataGridTemplateColumn Header="Delete" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -252,8 +311,11 @@
                             </DataGrid.Columns>
                         </DataGrid>
 
-                        <Button Content="Clear All" Grid.Row="7" Grid.Column="2" Margin ="30,10,30,10" Background="#849531" Foreground="AntiqueWhite"/>
-                        <Button Content="Calculate" Command ="{Binding Calculate}" Grid.Row="7" Grid.Column="0" Margin ="30,10,30,10" Background="#849531" Foreground="AntiqueWhite"/>
+                        <Button Content="Calculate" IsEnabled="{Binding Flag}" Command ="{Binding Calculate}" 
+                                Grid.Row="7" Grid.Column="0" Margin ="30,10,30,10" 
+                                Background="#849531" Foreground="AntiqueWhite" 
+                                />
+                        <Button Content="Clear All" Command ="{Binding ClearAll}" Grid.Row="7" Grid.Column="2" Margin ="30,10,30,10" Background="#849531" Foreground="AntiqueWhite"/>
 
                         <!--Controls in Column 2 -->
                         <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" CornerRadius="2">
@@ -271,29 +333,24 @@
                         <Border Visibility="{Binding Option, 
                         Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
                             Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Width" Padding="2 2 0 0"/>
+                            <TextBox x:Name="Breadth" Text="{Binding Breadth, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
                         </Border>
                         <Border Visibility="{Binding Option, 
                         Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
                             Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Height" Padding="2 2 0 0"/>
-                        </Border>
-                        <Border Visibility="{Binding Option, 
-                        Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                            Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Side_Cover" Padding="2 2 0 0"/>
+                            <TextBox x:Name="Height" Text="{Binding Height, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
                         </Border>
 
                         <!--Input field for circular column-->
                         <Border Visibility="{Binding Option, 
                         Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0 2 5 2"  
                             Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Radius" Padding="2 2 0 0" Text="{Binding Radius}" />
+                            <TextBox x:Name="Radius" Padding="2 2 0 0" Text="{Binding Radius, ValidatesOnDataErrors=True}" />
                         </Border>
                         <Border Visibility="{Binding Option, 
                         Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0 2 5 2"  
                             Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Dia" Background="#EFEFEF" Padding="2 2 0 0" Text="{Binding Diameter}"/>
+                            <TextBox x:Name="Dia" Background="#EFEFEF" Padding="2 2 0 0" Text="{Binding Diameter, ValidatesOnDataErrors=True}"/>
                         </Border>
 
                         <!-- Alternate Style
@@ -304,11 +361,16 @@
                     </Border>
                     -->
 
-
                         <Border Margin="0 2 5 2"  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox Padding="2 2 0 0"/>
+                            <TextBox Padding="2 2 0 0" Text="{Binding Cover, ValidatesOnDataErrors=True}"/>
                         </Border>
 
+                        <!--Side Cover for rectangular-->
+                        <Border Visibility="{Binding Option, 
+                         Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
+                             Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
+                            <TextBox x:Name="Side_Cover" Text="{Binding SideCover, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
+                        </Border>
 
                         <!-- Labels in Column 2 of Inner Grid -->
                         <Grid Grid.Column="2" Grid.Row="8" Grid.RowSpan="5">
@@ -324,27 +386,31 @@
                                 <RowDefinition Height="30"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" 
-                                   Text="Total A" FontWeight="ExtraBold"/>
-                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Total
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" 
+                                   FontWeight="Bold">
+                                Total Area (mm<Run FontSize="7pt" BaselineAlignment="TextTop">2</Run>)
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Total
                                 I<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
+                                (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
                             </TextBlock>
-                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold"> Total
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" FontWeight="Bold"> Total
                                 I<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
+                                (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
                             </TextBlock>
-                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Total
-                                r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Total
+                                r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run> (mm)
                             </TextBlock>
-                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Total
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Total
+                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run> (mm)
                             </TextBlock>
 
-                            <TextBlock x:Name="TA" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
-                                   Background="#EFEFEF" FontWeight="ExtraBold" Margin="0 2 0 2"/>
-                            <TextBlock x:Name="TIX" Grid.Row="1" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="TIY" Grid.Row="2" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="TRX" Grid.Row="3" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
-                            <TextBlock x:Name="TRY" Grid.Row="4" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" FontWeight="Bold"/>
+                            <TextBox x:Name="TA" Text="{Binding TotalArea}" IsReadOnly="True" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
+                                   Background="#EFEFEF" Margin="0 2 0 2"/>
+                            <TextBox x:Name="TIX" Text="{Binding TotalIx}" IsReadOnly="True" Grid.Row="1" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
+                            <TextBox x:Name="TIY" Text="{Binding TotalIy}" IsReadOnly="True" Grid.Row="2" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
+                            <TextBox x:Name="TRX" Text="{Binding TotalRx}" IsReadOnly="True" Grid.Row="3" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
+                            <TextBox x:Name="TRY" Text="{Binding TotalRy}" IsReadOnly="True" Grid.Row="4" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
                         </Grid>
                         
                     </Grid>
