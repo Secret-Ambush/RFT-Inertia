@@ -1,39 +1,39 @@
-﻿using WpfApp1;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Fasetto.Word;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
-using System.IO;
 
 namespace WpfApp1
 {
-    public class WindowViewModel : BaseViewModel
+    public class WindowViewModel : BaseViewModel, IDataErrorInfo
     {
         #region Private Properties
 
-        private ObservableCollection<Rebars>? user_int;
+        private ObservableCollection<Rebars>? _userint;
         private Window mWindow;
-        private bool _option;
+        private static bool _option = true;
         private ComboBoxItem _mySelectedItem;
         private string _image = "Images/full.jpg";
-        private float _radius;
-        private float _diameter;
-        const float PI = 3.14f;
+        private double _radius;
+        private double _diameter;
+        private double _sidecover;
+        private double _height;
+        private double _breadth;
+        private double _totalAreaOfSection;
+        const double PI = 3.14f;
 
-        private static float _ccenterX = 0;
-        private static float _ccenterY = 0;
+        private static double _areaOfRebars = 0;
         private static double _rebarIx = 0;
         private static double _rebarIy = 0;
         private static double _rebarRx = 0;
         private static double _rebarRy = 0;
+        private static double _cover = 0;
+        private static double _totalIx = 0;
+        private static double _totalIy = 0;
+        private static double _totalRx = 0;
+        private static double _totalRy = 0;
+        private bool _flag;
 
         #endregion
 
@@ -46,10 +46,10 @@ namespace WpfApp1
         }
         public ObservableCollection<Rebars>? Entries
         {
-            get { return user_int; }
+            get { return _userint; }
             set
             {
-                user_int = value; 
+                _userint = value;
                 OnPropertyChanged(nameof(Entries));
             }
         }
@@ -57,6 +57,7 @@ namespace WpfApp1
         public ICommand MaximizeCommand { get; set; }
         public ICommand CloseCommand { get; set; }
         public ICommand Calculate { get; set; }
+        public ICommand ClearAll { get; set; }
 
         public double RebarIx
         {
@@ -74,20 +75,20 @@ namespace WpfApp1
                 _rebarIy = value; OnPropertyChanged(nameof(RebarIy));
             }
         }
-        public double RebarRx
+        public double RebarRadiusX
         {
             get => _rebarRx;
             set
             {
-                _rebarRx = value; OnPropertyChanged(nameof(RebarRx));
+                _rebarRx = value; OnPropertyChanged(nameof(RebarRadiusX));
             }
         }
-        public double RebarRy
+        public double RebarRadiusY
         {
             get => _rebarRy;
             set
             {
-                _rebarRy = value; OnPropertyChanged(nameof(RebarRy));
+                _rebarRy = value; OnPropertyChanged(nameof(RebarRadiusY));
             }
         }
         public bool Option
@@ -101,7 +102,7 @@ namespace WpfApp1
             set
             {
                 _mySelectedItem = value;
-                switch(_mySelectedItem.Content.ToString())
+                switch (_mySelectedItem.Content.ToString())
                 {
                     case ("Rectangular Column"):
                     case ("Rectangular Beam"):
@@ -111,7 +112,7 @@ namespace WpfApp1
                 }
             }
         }
-        public float Radius
+        public double Radius
         {
             get => _radius;
             set
@@ -120,7 +121,15 @@ namespace WpfApp1
                 Diameter = _radius * 2; OnPropertyChanged(nameof(Diameter));
             }
         }
-        public float Diameter
+        public double AreaOfRebars
+        {
+            get => _areaOfRebars;
+            set
+            {
+                _areaOfRebars = value; OnPropertyChanged(nameof(AreaOfRebars));
+            }
+        }
+        public double Diameter
         {
             get => _diameter;
             set
@@ -129,80 +138,147 @@ namespace WpfApp1
                 _radius = _diameter / 2; OnPropertyChanged(nameof(Radius));
             }
         }
-        public float Centroid
+        public double Height
         {
-            get => _ccenterX;
+            get => _height;
             set
             {
-                _ccenterX = value; OnPropertyChanged(nameof(Centroid));
+                _height = value; OnPropertyChanged(nameof(Height));
             }
         }
-        public void Circular_Centroid()
+        public double Breadth
         {
-            float A_rebar_x = 0;
-            float A_rebar_y = 0;
-
-            if (_radius != 0 && user_int is not null)
+            get => _breadth;
+            set
             {
-                
-                
-                foreach (var item in user_int)
-                {
-                    var radius_Rebar = item.Dia / 2; 
-                    var slice = (2 * Math.PI) / item.Num;
-
-                    for (int i = 0; i < item.Num; i++)
-                    {
-                        var angle = slice * i;
-                        var x = (_radius - item.DeltaY) * Math.Cos(angle);
-                        var y = (_radius - item.DeltaY) * Math.Sin(angle);
-                        A_rebar_x += PI * (float) Math.Pow(radius_Rebar,2) * (float)x;
-                        A_rebar_y += PI * (float)Math.Pow(radius_Rebar, 2) * (float)y;
-                    }
-                    
-                }
+                _height = value; OnPropertyChanged(nameof(Height));
+                _breadth = value; OnPropertyChanged(nameof(Breadth));
             }
-
-            float A = PI * (float)Math.Pow(_radius, 2);
-            Centroid = A_rebar_x / A;
-            _ccenterY = A_rebar_y / A;
         }
-        public void Inertia_Cal()
+        public double SideCover
         {
-            double A_rebar = 0;
-            double Ix = 0;
-            double Iy = 0;
+            get => _sidecover;
+            set
+            {
+                _sidecover = value; OnPropertyChanged(nameof(SideCover));
+            }
+        }
+        public double Cover
+        {
+            get => _cover;
+            set
+            {
+                _cover = value; OnPropertyChanged(nameof(Cover));
+                _sidecover = value; OnPropertyChanged(nameof(SideCover));
+            }
+        }
+        public double TotalArea
+        {
+            get => _totalAreaOfSection;
+            set
+            {
+                _totalAreaOfSection = value; OnPropertyChanged(nameof(TotalArea));
+            }
+        }
+        public double TotalIx
+        {
+            get => _totalIx;
+            set
+            {
+                _totalIx = value; OnPropertyChanged(nameof(TotalIx));
+            }
+        }
+        public double TotalIy
+        {
+            get => _totalIy;
+            set
+            {
+                _totalIy = value; OnPropertyChanged(nameof(TotalIy));
+            }
+        }
+        public double TotalRx
+        {
+            get => _totalRx;
+            set
+            {
+                _totalRx = value; OnPropertyChanged(nameof(TotalRx));
+            }
+        }
+        public double TotalRy
+        {
+            get => _totalRy;
+            set
+            {
+                _totalRy = value; OnPropertyChanged(nameof(TotalRy));
+            }
+        }
 
-            if (_radius != 0 && user_int is not null)
-            { 
-                foreach (var item in user_int)
+        public bool Flag
+        {
+            get => _flag;
+            set
+            {
+                foreach (var item in Entries)
                 {
-                    double radius_Rebar = item.Dia / 2;
-                    A_rebar = PI * Math.Pow(radius_Rebar, 2);
-                    double slice = (2 * Math.PI) / item.Num;
-
-                    for (int i = 0; i < item.Num; i++)
-                    {
-                        double angle = slice * i;
-                        double x = (_radius - item.DeltaY) * Math.Cos(angle);
-                        double y = (_radius - item.DeltaY) * Math.Sin(angle);
-                        Ix += ((PI * Math.Pow(item.Dia, 4)) / 64) + (A_rebar * Math.Pow(x,2));
-                        Iy += ((PI * Math.Pow(item.Dia, 4)) / 64) + (A_rebar * Math.Pow(y, 2));
-                    }
-
+                    var d = item as Rebars;
+                    if (d != null && !string.IsNullOrEmpty(d.Error)) _flag = false;
                 }
+                _flag = true;
+                OnPropertyChanged(nameof(Flag));
             }
 
-            RebarRx = Math.Round(Ix, 5);
-            RebarRy = Math.Round(Iy, 2); 
+        }
+        public void CalculatingInertia()
+        {
+            if (!Option) //circular
+            {
+                CircularSections c = new CircularSections();
+                double[] inertia = c.RebarInertiaCal(Radius, Entries, Cover);
 
+                RebarIx = inertia[0];
+                RebarIy = inertia[1];
+
+                AreaOfRebars = inertia[2];
+
+                RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
+                RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
+
+                double[] total = c.TotalInertiaCal(Diameter);
+                TotalIx = TotalIy = total[0];
+
+                TotalArea = PI * Math.Pow(Radius, 2);
+
+                TotalRx = Math.Sqrt(TotalIx / TotalArea);
+                TotalRy = Math.Sqrt(TotalIy / TotalArea);
+            }
+
+            else
+            {
+                RectangularSections r = new RectangularSections();
+
+                double[] inertia = r.RebarInertiaCal(Breadth, Height, Entries, Cover, SideCover);
+
+                RebarIx = inertia[0];
+                RebarIy = inertia[1];
+
+                AreaOfRebars = inertia[2];
+
+                RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
+                RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
+
+                double[] total = r.TotalInertiaCal(Breadth, Height);
+                TotalIx = TotalIy = total[0];
+
+                TotalArea = Breadth * Height;
+
+                TotalRx = Math.Sqrt(TotalIx / TotalArea);
+                TotalRy = Math.Sqrt(TotalIy / TotalArea);
+            }
         }
 
         #endregion
 
-
-
-        #region Constructor
+        #region Constructors
         public WindowViewModel(Window window)
         {
             mWindow = window;
@@ -223,10 +299,13 @@ namespace WpfApp1
             });
             CloseCommand = new RelayCommand(() => mWindow.Close());
 
-            Calculate = new RelayCommand(() => 
-            { 
-                Circular_Centroid();
-                Inertia_Cal();
+            Calculate = new RelayCommand(() => CalculatingInertia());
+
+            ClearAll = new RelayCommand(() =>
+            {
+                RebarIx = RebarIy = RebarRadiusX = RebarRadiusY = Radius = Diameter = TotalRx = TotalRy = 0;
+                Height = Breadth = Cover = SideCover = AreaOfRebars = 0;
+                Entries = new ObservableCollection<Rebars>();
             });
 
             Entries = new ObservableCollection<Rebars>();
@@ -234,6 +313,13 @@ namespace WpfApp1
 
         }
 
+        public WindowViewModel()
+        {
+        }
+
+        #endregion
+
+        #region Private Helpers
         private void OnEntriesCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             foreach (var item in Entries)
@@ -244,17 +330,73 @@ namespace WpfApp1
 
         #endregion
 
+        string IDataErrorInfo.Error
+        {
+            get { return null; }
+        }
+
+        string IDataErrorInfo.this[string propertyName]
+        {
+            get
+            {
+                if (propertyName == "Cover")
+                {
+
+                    if (!Option)
+                    {
+                        if (Cover < 0) { return "Positive value only."; }
+                        if (Cover >= Radius) { return "Cover can't be greater than or equal to radius"; }
+                    }
+                    else
+                    {
+                        if (Cover < 0) { return "Positive value only."; }
+                        if (Cover >= Height) { return "Cover can't be greater than or equal to height"; }
+                    }
+                }
+
+                if (propertyName == "SideCover")
+                {
+                    if (SideCover >= Breadth) { return "Side Cover can't be greater than or equal to width"; }
+                    if (SideCover <= 0) { return "Non-zero positive value only."; }
+                }
+
+                if (propertyName == "Height")
+                {
+                    if (Height <= 0) { return "Non-zero positive value only."; }
+                }
+
+                if (propertyName == "Breadth")
+                {
+                    if (Breadth <= 0) { return "Non-zero positive value only."; }
+                }
+
+                if (propertyName == "Radius")
+                {
+                    if (Radius <= 0) { return "Non-zero positive value only."; }
+                }
+
+                if (propertyName == "Diameter")
+                {
+                    if (Diameter <= 0) { return "Non-zero positive value only."; }
+                }
+
+                // If there's no error, null gets returned
+                return null;
+            }
+
+        }
+
     }
 
-    public class Rebars: BaseViewModel
+    public class Rebars : WindowViewModel, IDataErrorInfo
     {
-        private float _dia;
+        private double _dia;
         private int _num;
-        private float _delta;
+        private double _delta;
         private int _count;
 
 
-        public float Dia
+        public double Dia
         {
             get { return _dia; }
             set { _dia = value; }
@@ -269,16 +411,57 @@ namespace WpfApp1
         public int Count
         {
             get => _count;
-            set { 
+            set
+            {
                 _count = value;
                 OnPropertyChanged(nameof(Count));
             }
         }
 
-        public float DeltaY
+        public double DeltaY
         {
             get { return _delta; }
-            set { _delta = value; }
+            set
+            {
+                if (Count == 1) { _delta = 0; }
+                else { _delta = value; }
+            }
+        }
+
+        public string Error => throw new NotImplementedException();
+
+        public string this[string propName]
+        {
+            get
+            {
+                if (propName == "Num")
+                {
+                    if (Num < 4) { return "Number of Rebars must be a minimum of 4"; }
+                    if (Num <= 0) { return "Non-zero positive value only."; }
+                }
+
+                if (propName == "DeltaY")
+                {
+                    if (DeltaY < 0) { return "Positive value only."; }
+                }
+
+                if (propName == "Dia")
+                {
+                    if (!Option)
+                    {
+                        if (Dia > Radius) { return "Diamter of rebar can't be greater or equal to radius of circle"; }
+                        if (Dia <= 0) { return "Non-zero positive value only."; }
+                        if (DeltaY >= Radius) { return "Delta Y can't be greater or equal to radius of circle"; }
+                    }
+                    else
+                    {
+                        if (Dia >= Breadth || Dia >= Height) { return "Diamter of rebar can't be greater or equal to radius of circle"; }
+                        if (Dia <= 0) { return "Non-zero positive value only."; }
+                    }
+                }
+
+                return null;
+            }
         }
 
         public Rebars()
