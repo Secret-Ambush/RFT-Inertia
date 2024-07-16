@@ -3,23 +3,26 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace WpfApp1
 {
-    public class WindowViewModel : BaseViewModel, IDataErrorInfo
+    public class WindowViewModel : BaseViewModel
     {
         #region Private Properties
 
         private ObservableCollection<Rebars>? _userint;
         private Window mWindow;
-        private static bool _option = true;
+        private static bool _isRectangularSection = true;
         private ComboBoxItem _mySelectedItem;
+        private ComboBoxItem _selectedCode;
         private string _image = "Images/full.jpg";
         private double _radius;
         private double _diameter;
         private double _sidecover;
         private double _height;
         private double _breadth;
+        private double _spacing;
         private double _totalAreaOfSection;
         const double PI = 3.14f;
 
@@ -33,7 +36,6 @@ namespace WpfApp1
         private static double _totalIy = 0;
         private static double _totalRx = 0;
         private static double _totalRy = 0;
-        private bool _flag;
 
         #endregion
 
@@ -56,7 +58,7 @@ namespace WpfApp1
         public ICommand MinimizeCommand { get; set; }
         public ICommand MaximizeCommand { get; set; }
         public ICommand CloseCommand { get; set; }
-        public ICommand Calculate { get; set; }
+        public ICommand CalculateInertia { get; set; }
         public ICommand ClearAll { get; set; }
 
         public double RebarIx
@@ -91,10 +93,13 @@ namespace WpfApp1
                 _rebarRy = value; OnPropertyChanged(nameof(RebarRadiusY));
             }
         }
-        public bool Option
+        public bool isRectangularSection
         {
-            get { return _option; }
-            set { _option = value; OnPropertyChanged(nameof(Option)); }
+            get { return _isRectangularSection; }
+            set { 
+                _isRectangularSection = value; 
+                OnPropertyChanged(nameof(_isRectangularSection));
+            }
         }
         public ComboBoxItem MySelectedItem
         {
@@ -106,9 +111,31 @@ namespace WpfApp1
                 {
                     case ("Rectangular Column"):
                     case ("Rectangular Beam"):
-                        { Option = true; break; }
+                        { isRectangularSection = true; break; }
                     case ("Circular Column"):
-                        { Option = false; break; }
+                        { isRectangularSection = false; break; }
+                }
+            }
+        }
+        private void clearContents()
+        {
+            RebarIx = RebarIy = RebarRadiusX = RebarRadiusY = Radius = Diameter = TotalRx = TotalRy = 0;
+            Height = Breadth = Cover = SideCover = AreaOfRebars = 0;
+            Entries = new ObservableCollection<Rebars>();
+            HasErrors = new bool[10];
+        }
+        public ComboBoxItem SelectedCode
+        {
+            get { return _selectedCode; }
+            set
+            {
+                _mySelectedItem = value;
+                switch (_selectedCode.Content.ToString())
+                {
+                    case ("some code 1"):
+                        { Spacing = 5; break; }
+                    case ("some code 2"):
+                        { Spacing = 10; break; }
                 }
             }
         }
@@ -172,6 +199,14 @@ namespace WpfApp1
                 _sidecover = value; OnPropertyChanged(nameof(SideCover));
             }
         }
+        public double Spacing
+        {
+            get => _spacing;
+            set
+            {
+                _spacing = value; OnPropertyChanged(nameof(Spacing));
+            }
+        }
         public double TotalArea
         {
             get => _totalAreaOfSection;
@@ -213,24 +248,9 @@ namespace WpfApp1
             }
         }
 
-        public bool Flag
+        public void CalculateInertia_Execute()
         {
-            get => _flag;
-            set
-            {
-                foreach (var item in Entries)
-                {
-                    var d = item as Rebars;
-                    if (d != null && !string.IsNullOrEmpty(d.Error)) _flag = false;
-                }
-                _flag = true;
-                OnPropertyChanged(nameof(Flag));
-            }
-
-        }
-        public void CalculatingInertia()
-        {
-            if (!Option) //circular
+            if (!isRectangularSection)
             {
                 CircularSections c = new CircularSections();
                 double[] inertia = c.RebarInertiaCal(Radius, Entries, Cover);
@@ -275,6 +295,24 @@ namespace WpfApp1
                 TotalRy = Math.Sqrt(TotalIy / TotalArea);
             }
         }
+        public bool CalculateInertia_CanExecute()
+        {
+            if (Entries.Count != 0)
+            {
+                foreach (bool item in HasErrors)
+                {
+                    if (item)
+                    { return false; }
+                }
+
+                return true;
+            }
+
+            return false;
+            
+        }
+
+        public static bool[] HasErrors = new bool[10];
 
         #endregion
 
@@ -299,18 +337,24 @@ namespace WpfApp1
             });
             CloseCommand = new RelayCommand(() => mWindow.Close());
 
-            Calculate = new RelayCommand(() => CalculatingInertia());
+            CalculateInertia = new RelayCommand(() => CalculateInertia_Execute(), CalculateInertia_CanExecute);
 
             ClearAll = new RelayCommand(() =>
             {
                 RebarIx = RebarIy = RebarRadiusX = RebarRadiusY = Radius = Diameter = TotalRx = TotalRy = 0;
                 Height = Breadth = Cover = SideCover = AreaOfRebars = 0;
                 Entries = new ObservableCollection<Rebars>();
+                HasErrors = new bool[10];
             });
 
             Entries = new ObservableCollection<Rebars>();
             Entries.CollectionChanged += OnEntriesCollectionChanged;
+        }
 
+        private double GetMinimumDimension()
+        {
+            if (isRectangularSection) return Math.Min(Breadth, Height);
+            else return Radius;
         }
 
         public WindowViewModel()
@@ -324,60 +368,104 @@ namespace WpfApp1
         {
             foreach (var item in Entries)
             {
-                item.Count = Entries.IndexOf(item) + 1;
+                item.RowCount = Entries.IndexOf(item) + 1;
+                item.GetMinimumDimension = GetMinimumDimension;
             }
         }
 
         #endregion
 
-        string IDataErrorInfo.Error
+
+        public override string Error
         {
-            get { return null; }
+            get { return null; } // return the error message
         }
 
-        string IDataErrorInfo.this[string propertyName]
+        public override string this[string propertyName]
         {
             get
             {
                 if (propertyName == "Cover")
                 {
 
-                    if (!Option)
+                    if (!isRectangularSection)
                     {
-                        if (Cover < 0) { return "Positive value only."; }
-                        if (Cover >= Radius) { return "Cover can't be greater than or equal to radius"; }
+                        
+                        if (Cover < 0) { HasErrors[0] = true; return "Positive value only."; }
+                        else if (Cover >= Radius) { HasErrors[0] = true; return "Cover can't be greater than or equal to radius"; }
+                        else { HasErrors[0] = false; return null;  }
                     }
                     else
                     {
-                        if (Cover < 0) { return "Positive value only."; }
-                        if (Cover >= Height) { return "Cover can't be greater than or equal to height"; }
+                        if (Cover < 0) { HasErrors[0] = true; return "Positive value only."; }
+                        else if (Cover >= Height) { HasErrors[0] = true; return "Cover can't be greater than or equal to height"; }
+                        else { HasErrors[0] = false; return null; }
                     }
                 }
 
                 if (propertyName == "SideCover")
                 {
-                    if (SideCover >= Breadth) { return "Side Cover can't be greater than or equal to width"; }
-                    if (SideCover <= 0) { return "Non-zero positive value only."; }
+                    if (!isRectangularSection) { HasErrors[1] = false; return null; }
+                    else
+                    {
+                        if (SideCover >= Breadth) { HasErrors[1] = true; return "Side Cover can't be greater than or equal to width"; }
+                        if (SideCover <= 0) { HasErrors[1] = true; return "Non-zero positive value only."; }
+                        else { HasErrors[1] = false; return null; }
+                    }
+                    
                 }
 
                 if (propertyName == "Height")
                 {
-                    if (Height <= 0) { return "Non-zero positive value only."; }
+                    if (!isRectangularSection) { HasErrors[1] = false; return null; }
+                    else
+                    {
+                        if (Height <= 0) { HasErrors[2] = true; return "Non-zero positive value only."; }
+                        else
+                        {
+                            HasErrors[2] = false;
+                            HasErrors[4] = false; //radius
+                            HasErrors[5] = false; //diameter
+                            return null;
+                        }
+                    }
                 }
 
                 if (propertyName == "Breadth")
                 {
-                    if (Breadth <= 0) { return "Non-zero positive value only."; }
+                    if (!isRectangularSection) { HasErrors[1] = false; return null; }
+                    else
+                    {
+                        if (Breadth <= 0) { HasErrors[3] = true; return "Non-zero positive value only."; }
+                        else { HasErrors[3] = false; return null; }
+                    }
                 }
 
                 if (propertyName == "Radius")
                 {
-                    if (Radius <= 0) { return "Non-zero positive value only."; }
+                    if (isRectangularSection) { HasErrors[1] = false; return null; }
+                    else
+                    {
+                        if (Radius <= 0) { HasErrors[4] = true; return "Non-zero positive value only."; }
+                        else
+                        {
+                            HasErrors[4] = false;
+                            HasErrors[1] = false; // Side Cover
+                            HasErrors[3] = false; // Breadth
+                            HasErrors[2] = false; // Height
+                            return null;
+                        }
+                    }
                 }
 
                 if (propertyName == "Diameter")
                 {
-                    if (Diameter <= 0) { return "Non-zero positive value only."; }
+                    if (isRectangularSection) { HasErrors[1] = false; return null; }
+                    else
+                    {
+                        if (Diameter <= 0) { HasErrors[5] = true; return "Non-zero positive value only."; }
+                        else { HasErrors[5] = false; return null; }
+                    }
                 }
 
                 // If there's no error, null gets returned
@@ -388,33 +476,36 @@ namespace WpfApp1
 
     }
 
-    public class Rebars : WindowViewModel, IDataErrorInfo
+    public class Rebars : WindowViewModel
     {
+
+        #region Private members
         private double _dia;
         private int _num;
         private double _delta;
         private int _count;
+        #endregion
 
-
-        public double Dia
+        #region Public Properties
+        public double RebarDia
         {
             get { return _dia; }
             set { _dia = value; }
         }
 
-        public int Num
+        public int NumOfRebar
         {
             get { return _num; }
             set { _num = value; }
         }
 
-        public int Count
+        public int RowCount
         {
             get => _count;
             set
             {
                 _count = value;
-                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(nameof(RowCount));
             }
         }
 
@@ -423,40 +514,50 @@ namespace WpfApp1
             get { return _delta; }
             set
             {
-                if (Count == 1) { _delta = 0; }
+                if (RowCount == 1) { _delta = 0; }
                 else { _delta = value; }
             }
         }
 
-        public string Error => throw new NotImplementedException();
+        #endregion
 
-        public string this[string propName]
+        override public string Error
+        {
+            get { return null; }
+        }
+
+        public override string this[string propName]
         {
             get
             {
-                if (propName == "Num")
+                var minValue = GetMinimumDimension?.Invoke() ?? 0;
+                if (propName == "NumOfRebar")
                 {
-                    if (Num < 4) { return "Number of Rebars must be a minimum of 4"; }
-                    if (Num <= 0) { return "Non-zero positive value only."; }
+                    if (NumOfRebar <= 0) { HasErrors[6] = true; return "Non-zero positive value only."; }
+                    else if (NumOfRebar < 2) { HasErrors[6] = true; return "Number of rebars must be a minimum of 2"; }
+                    else { HasErrors[6] = false; return null; }
                 }
 
                 if (propName == "DeltaY")
                 {
-                    if (DeltaY < 0) { return "Positive value only."; }
+                    if (DeltaY < 0) { HasErrors[7] = true; return "Positive value only."; }
+                    else if (DeltaY >= minValue) { HasErrors[7] = true; return "Delta Y can't be greater or equal to radius of column"; }
+                    else { HasErrors[7] = false; return null; }
                 }
 
-                if (propName == "Dia")
+                if (propName == "RebarDia")
                 {
-                    if (!Option)
+                    if (!isRectangularSection)
                     {
-                        if (Dia > Radius) { return "Diamter of rebar can't be greater or equal to radius of circle"; }
-                        if (Dia <= 0) { return "Non-zero positive value only."; }
-                        if (DeltaY >= Radius) { return "Delta Y can't be greater or equal to radius of circle"; }
+                        if (RebarDia <= 0) { HasErrors[8] = true; return "Non-zero positive value only."; }
+                        else if (RebarDia > minValue) { HasErrors[8] = true; return "Diamter of rebar can't be greater or equal to radius of column"; }
+                        else { HasErrors[8] = false; return null; }
                     }
                     else
                     {
-                        if (Dia >= Breadth || Dia >= Height) { return "Diamter of rebar can't be greater or equal to radius of circle"; }
-                        if (Dia <= 0) { return "Non-zero positive value only."; }
+                        if (RebarDia <= 0) { HasErrors[9] = true; return "Non-zero positive value only."; }
+                        else if (RebarDia > minValue) { HasErrors[9] = true; return "Diamter of rebar can't be greater or equal to boundary of column"; }
+                        else { HasErrors[9] = false; return null; }
                     }
                 }
 
@@ -464,6 +565,7 @@ namespace WpfApp1
             }
         }
 
+        public Func<double> GetMinimumDimension { get; set; }
         public Rebars()
         {
         }
