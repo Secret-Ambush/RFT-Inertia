@@ -1,5 +1,5 @@
 | Rectangular                         | Circular                            |
 | ----------------------------------- | ----------------------------------- |
-|![Screenshot 2024-07-10 093937](https://github.com/Secret-Ambush/RFT-Inertia/Images/Rectangle.png) | ![Screenshot 2024-07-10 093909](https://github.com/Secret-Ambush/RFT-Inertia/Images/Circle.png)
+|![Rectangular](https://github.com/Secret-Ambush/RFT-Inertia/blob/main/Images/Rectangle.png?raw=true) | ![Circular]([https://github.com/Secret-Ambush/RFT-Inertia/Images/Circle.png](https://github.com/Secret-Ambush/RFT-Inertia/blob/main/Images/Circle.png?raw=true))
 
 
