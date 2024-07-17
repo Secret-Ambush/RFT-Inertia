@@ -1,61 +1,248 @@
-<Window  
+<Window
     x:Class="WpfApp1.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:WpfApp1"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:converter="clr-namespace:System.Windows"
-        d:DataContext="{d:DesignInstance Type=vm:WindowViewModel}"
-        MouseDown="Window_MouseDown"
-        WindowStartupLocation="CenterScreen"
-        mc:Ignorable="d"
-        WindowStyle="SingleBorderWindow"
-        MinWidth="600"
-        MinHeight="500"
-        ResizeMode="CanResizeWithGrip"
-        x:Name="AppWindow" 
-        Icon="Resources/logo.png"
-        Title="Inertia Calculator" Height="700" Width="800">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:System.Windows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WpfApp1"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:WpfApp1"
+    x:Name="AppWindow"
+    Title="Inertia Calculator"
+    Width="800"
+    Height="650"
+    MinWidth="700"
+    MinHeight="200"
+    d:DataContext="{d:DesignInstance Type=vm:WindowViewModel}"
+    Icon="Resources/logo.png"
+    MouseDown="Window_MouseDown"
+    ResizeMode="CanResizeWithGrip"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="SingleBorderWindow"
+    mc:Ignorable="d">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="0.5" CornerRadius="4" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
+        <WindowChrome
+            CaptionHeight="0"
+            CornerRadius="4"
+            GlassFrameThickness="0.5"
+            ResizeBorderThickness="7"
+            UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="./Styles/Fonts.xaml"/>
+                <ResourceDictionary Source="./Styles/Fonts.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!--  Tool tip for Textbox  -->
             <Style TargetType="TextBox">
-                <Setter Property="ToolTipService.ShowDuration" Value="5000"/>
-                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
-                <Setter Property="ToolTipService.HasDropShadow" Value="True"/>
+                <Setter Property="ToolTipService.ShowDuration" Value="5000" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                <Setter Property="ToolTipService.HasDropShadow" Value="True" />
                 <Style.Triggers>
                     <Trigger Property="Validation.HasError" Value="true">
-                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
-                        <Setter Property="Foreground" Value="Red"/>
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        <Setter Property="Foreground" Value="Red" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <!--  Tool tip for Datagrid  -->
             <Style TargetType="DataGridCell">
-                <Setter Property="ToolTipService.ShowDuration" Value="5000"/>
-                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
-                <Setter Property="ToolTipService.HasDropShadow" Value="True"/>
+                <Setter Property="ToolTipService.ShowDuration" Value="5000" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                <Setter Property="ToolTipService.HasDropShadow" Value="True" />
                 <Style.Triggers>
                     <Trigger Property="Validation.HasError" Value="true">
-                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
-                        <Setter Property="Foreground" Value="Red"/>
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        <Setter Property="Foreground" Value="Red" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <converter:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
-            <converter:InverseBooleanToVisibilityConverter x:Key="inversebooleanToVisibilityConverter"/>
+
+            <!--  Validation Error Template for a DataGrid Row  -->
+            <Style TargetType="{x:Type DataGridRow}">
+                <Setter Property="ToolTipService.ShowDuration" Value="5000" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                <Setter Property="ToolTipService.HasDropShadow" Value="True" />
+                <Setter Property="ValidationErrorTemplate">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Image
+                                Width="11"
+                                Height="11"
+                                Margin="0"
+                                Source="Images/cancel.png"
+                                ToolTip="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}}, Path=(Validation.Errors)[0].ErrorContent}" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--  Style Template for Calculate buttons  -->
+            <Style x:Key="functionButtonStyle" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Background" Value="#74a892" />
+                <Setter Property="Foreground" Value="AntiqueWhite" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="ButtonGrid" Background="{TemplateBinding Background}">
+                                <ContentPresenter
+                                    x:Name="MyContentPresenter"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}" />
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ButtonGrid"
+                                                Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)"
+                                                To="#026161"
+                                                Duration="0:0:0.1">
+                                                <ColorAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseIn" Exponent="6" />
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ButtonGrid"
+                                                Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)"
+                                                To="#74a892"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Foreground" Value="#ffffea" />
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="#DDE5B4" />
+                        <Setter Property="Foreground" Value="#A98467" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  Style Template for Delete button in DataGrid  -->
+            <Style x:Key="deleteButton" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Background" Value="#ffffea" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter
+                                    x:Name="MyContentPresenter"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#c7522a" />
+                        <Setter Property="Foreground" Value="#fbf2c4" />
+                        <Setter Property="Cursor" Value="Hand" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  Style Template for Clear All button  -->
+            <Style x:Key="ClearButtonStyle" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Background" Value="#74a892" />
+                <Setter Property="Foreground" Value="AntiqueWhite" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="ButtonGrid" Background="{TemplateBinding Background}">
+                                <ContentPresenter
+                                    x:Name="MyContentPresenter"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}" />
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ButtonGrid"
+                                                Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)"
+                                                To="#c7522a"
+                                                Duration="0:0:0.1">
+                                                <ColorAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseIn" Exponent="6" />
+                                                </ColorAnimation.EasingFunction>
+                                            </ColorAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation
+                                                Storyboard.TargetName="ButtonGrid"
+                                                Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)"
+                                                To="#74a892"
+                                                Duration="0:0:0.3" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Foreground" Value="#ffffea" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!--  Converters  -->
+            <converter:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+            <converter:InverseBooleanToVisibilityConverter x:Key="inversebooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
-    <Border BorderBrush="#172D13" BorderThickness="2" Background="#F7F7F7">
+    <Border
+        Background="#e5c185"
+        BorderBrush="#74a892"
+        BorderThickness="5"
+        CornerRadius="10">
+
+        <Border.Effect>
+            <DropShadowEffect
+                BlurRadius="10"
+                Opacity="0.7"
+                ShadowDepth="0.2"
+                Color="Black" />
+        </Border.Effect>
+
         <Grid>
             <Grid.Resources>
                 <ControlTemplate x:Key="windowControls" TargetType="Button">
@@ -64,400 +251,1107 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="buttons" Property="Opacity" Value="1"/>
-                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter TargetName="buttons" Property="Opacity" Value="1" />
+                            <Setter Property="Cursor" Value="Hand" />
                         </Trigger>
                     </ControlTemplate.Triggers>
-                </ControlTemplate> 
+                </ControlTemplate>
             </Grid.Resources>
 
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="45" />
-                <RowDefinition Height="46*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="15*" />
+                <RowDefinition Height="10" />
             </Grid.RowDefinitions>
 
-            <!--title bar-->
+            <!--  title bar  -->
             <Border BorderThickness="0">
                 <Border.Background>
-                    <SolidColorBrush Color="#8DB48E"/>
+                    <SolidColorBrush Color="#74a892" />
                 </Border.Background>
 
-                <!--Window Icon and Title-->
+                <!--  Window Icon and Title  -->
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Icon -->
-                    <Border Grid.Column="0" Margin ="5 5 0 5">
-                        <Image Source="Resources/Jacobs.png" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    <!--  Icon  -->
+                    <Border Grid.Column="0" Margin="5,5,0,5">
+                        <Image
+                            Height="30"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Source="Resources/Jacobs.png" />
                     </Border>
 
-                    <!--Title-->
-                    <TextBlock FontFamily="{DynamicResource ParadiseLove}" Grid.Column="1" Text="Inertia Calculator" Height="Auto" Width="Auto" FontSize="25"
-                    FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <!--  Title  -->
+                    <TextBlock
+                        Grid.Column="1"
+                        Width="Auto"
+                        Height="Auto"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{DynamicResource ParadiseLove}"
+                        FontSize="25"
+                        FontWeight="Bold"
+                        Text="Inertia Calculator" />
 
-                    <!-- Close, Min, Max -->
+                    <!--  Close, Min, Max  -->
                     <Grid Grid.Column="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="120" />
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="39" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
+                        <Border
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="5,0,-5,0"
+                            CornerRadius="10">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Command="{Binding MinimizeCommand}" Template="{StaticResource windowControls}">
+                                    <Image Source="Images/min.jpg" Stretch="Fill" />
+                                </Button>
+                                <Button Command="{Binding MaximizeCommand}" Template="{StaticResource windowControls}">
+                                    <Image Source="{Binding Image}" Stretch="Fill" />
+                                </Button>
+                                <Button Command="{Binding CloseCommand}" Template="{StaticResource windowControls}">
+                                    <Image Source="Images/close.png" Stretch="Fill" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
 
-                        <Button Margin ="0 0 0 5" Grid.Column="1" Command="{Binding MinimizeCommand}" Template="{StaticResource windowControls}">
-                            <Image Source="Images/min.jpg" Stretch="Fill"/>
-                        </Button>
-                        <Button Margin ="0 0 0 5" Grid.Column="2" Command="{Binding MaximizeCommand}" Template="{StaticResource windowControls}">
-                            <Image Source="{Binding Image}" Stretch="Fill"/>
-                        </Button>
-                        <Button Margin ="0 0 2 5" Grid.Column="3" Command="{Binding CloseCommand}" Template="{StaticResource windowControls}">
-                            <Image Source="Images/close.png" Stretch="Fill"/>
-                        </Button>
                     </Grid>
                 </Grid>
             </Border>
 
-            <!--Main Content -->
+            <!--  Tabs  -->
             <Grid Grid.Row="1">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10"/>
-                </Grid.ColumnDefinitions>
-
-                <!--User Inputs-->
-                <GroupBox Grid.Column="1" Header="Properties" FontWeight="DemiBold" BorderBrush="#D76F30">
-                    <Grid x:Name="UserInputs">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- Labels in Column 0 of Inner Grid -->
-                        <Label FontFamily="{StaticResource ProductSans}" Grid.Row="1" Grid.Column="0" Content="Section Type" FontWeight="Bold"/>
-
-                        <!--Labels for rectangular sections-->
-                        <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                           Grid.Row="2" Grid.Column="0" Content="Width (mm)" FontWeight="Bold"/>
-                        <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                           Grid.Row="3" Grid.Column="0" Content="Height (mm)" FontWeight="Bold"/>
-                        <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" 
-                            Grid.Row="5" Grid.Column="0" Content="Side Cover (mm)" FontWeight="Bold"/>
-
-                        <!--Labels for circular sections-->
-
-                        <Label FontFamily="{StaticResource ArchDaughter}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" 
-                            Grid.Row="2" Grid.Column="0" Content="Radius (mm)" FontWeight="Bold"/>
-                        <Label FontFamily="{StaticResource ArchDaughter}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" 
-                            Grid.Row="3" Grid.Column="0" Content="Diameter (mm)" FontWeight="Bold"/>
-
-                        <!-- Alternate Style
-
-                    <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" 
-                                Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Content="Radius" FontWeight="Bold" Margin="0,15,0,15"/>
-                     -->
-
-                        <Label FontFamily="{StaticResource ProductSans}" Grid.Row="4" Grid.Column="0" Content="Cover (mm)" FontWeight="Bold"/>
-
-                        <Grid Grid.Row="8" Grid.Column="0" Grid.RowSpan="5">
-
+                <TabControl>
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Calculator" />
+                            </StackPanel>
+                        </TabItem.Header>
+                        <!--  Main Content  -->
+                        <Grid Background="#fef9e4">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                            </Grid.RowDefinitions>
+
+                            <!--  User Inputs  -->
+                            <GroupBox
+                                Grid.Column="1"
+                                BorderBrush="#D76F30"
+                                FontWeight="DemiBold"
+                                Header="Properties">
+                                <Grid x:Name="UserInputs">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="10" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="40" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                    </Grid.RowDefinitions>
+
+                                    <!--  Labels in Column 0 of Inner Grid  -->
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Content="Section Type"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold" />
+
+                                    <!--  Labels for rectangular sections  -->
+                                    <Label
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Content="Width (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" />
+                                    <Label
+                                        Grid.Row="3"
+                                        Grid.Column="0"
+                                        Content="Height (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" />
+                                    <Label
+                                        Grid.Row="5"
+                                        Grid.Column="0"
+                                        Content="Side Cover (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" />
+
+                                    <!--  Labels for circular sections  -->
+
+                                    <Label
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Content="Radius (mm)"
+                                        FontFamily="{StaticResource ArchDaughter}"
+                                        FontWeight="Bold"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
+                                    <Label
+                                        Grid.Row="3"
+                                        Grid.Column="0"
+                                        Content="Diameter (mm)"
+                                        FontFamily="{StaticResource ArchDaughter}"
+                                        FontWeight="Bold"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
+
+                                    <!-- Alternate Style
+
+        <Label FontFamily="{StaticResource ProductSans}" Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}"
+                    Grid.Row="2" Grid.RowSpan="2" Grid.Column="0" Content="Radius" FontWeight="Bold" Margin="0,15,0,15"/>
+                                    -->
+
+                                    <Label
+                                        Grid.Row="4"
+                                        Grid.Column="0"
+                                        Content="Cover (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold" />
+                                    <Label
+                                        Grid.Row="6"
+                                        Grid.Column="0"
+                                        Content="Spacing (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold" />
+
+                                    <Grid
+                                        Grid.Row="9"
+                                        Grid.RowSpan="5"
+                                        Grid.Column="0"
+                                        Margin="0,5,0,0">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
 
 
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" FontWeight="Bold">
-                                Rebar Area (mm<Run FontSize="7pt" BaselineAlignment="TextTop">2</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Rebar
-                            I<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
-                            (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" FontFamily="{StaticResource ParadiseLove}" Grid.Column="0" FontWeight="Bold"> Rebar
-                            I<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
-                            (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Rebar
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run> (mm)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Rebar
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run> (mm)
-                            </TextBlock>
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource ProductSans}"
+                                            FontWeight="Bold">
+                                            Rebar Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Rebar
+                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="2"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource ParadiseLove}"
+                                            FontWeight="Bold">
+                                            Rebar
+                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="3"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Rebar
+                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                            (mm)</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="4"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Rebar
+                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                            (mm)</TextBlock>
 
 
-                            <TextBox x:Name="RA" IsReadOnly="True" Text ="{Binding AreaOfRebars}" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
-                                Background="#EFEFEF" Padding="5" Margin="0 2 0 2"/>
-                            <TextBox x:Name="RIY" IsReadOnly="True" Text="{Binding RebarIx}" Grid.Row="1" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
-                            <TextBox x:Name="RIX" IsReadOnly="True" Text="{Binding RebarIy}" Grid.Row="2" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2" />
-                            <TextBox x:Name="RRX" IsReadOnly="True" Text="{Binding RebarRadiusX}" Grid.Row="3" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
-                            <TextBox x:Name="RRY" IsReadOnly="True" Text="{Binding RebarRadiusY}" Grid.Row="4" Grid.Column="1" Padding="5" Background="#EFEFEF" Margin="0 0 0 2"/>
+                                        <TextBox
+                                            x:Name="RA"
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Margin="0,2,0,2"
+                                            Padding="5"
+                                            Background="#EFEFEF"
+                                            FontFamily="{StaticResource ProductSans}"
+                                            IsReadOnly="True"
+                                            Text="{Binding AreaOfRebars}" />
+                                        <TextBox
+                                            x:Name="RIY"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Padding="5"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding RebarIx}" />
+                                        <TextBox
+                                            x:Name="RIX"
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Padding="5"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding RebarIy}" />
+                                        <TextBox
+                                            x:Name="RRX"
+                                            Grid.Row="3"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Padding="5"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding RebarRadiusX}" />
+                                        <TextBox
+                                            x:Name="RRY"
+                                            Grid.Row="4"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Padding="5"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding RebarRadiusY}" />
+
+                                    </Grid>
+
+
+                                    <!--  Table in Column 0 of Inner Grid  -->
+                                    <DataGrid
+                                        Grid.Row="7"
+                                        Grid.ColumnSpan="3"
+                                        Margin="10,10,10,10"
+                                        AutoGenerateColumns="False"
+                                        Background="White"
+                                        CanUserAddRows="True"
+                                        CanUserDeleteRows="True"
+                                        EnableRowVirtualization="False"
+                                        FontStyle="Normal"
+                                        Foreground="Black"
+                                        GridLinesVisibility="Vertical"
+                                        HeadersVisibility="All"
+                                        IsReadOnly="False"
+                                        ItemsSource="{Binding Entries}"
+                                        RowHeaderWidth="16"
+                                        SelectionMode="Single"
+                                        VerticalGridLinesBrush="AliceBlue">
+
+                                        <DataGrid.Resources>
+                                            <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
+                                                <Setter Property="Background" Value="#b8cdab" />
+                                            </Style>
+                                        </DataGrid.Resources>
+                                        <DataGrid.ColumnHeaderStyle>
+                                            <StaticResource ResourceKey="ColumnHeaderStyle" />
+                                        </DataGrid.ColumnHeaderStyle>
+
+                                        <!--  Row Number  -->
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Width="*"
+                                                Binding="{Binding RowCount, ValidatesOnDataErrors=True}"
+                                                IsReadOnly="True">
+                                                <DataGridTextColumn.Header>
+                                                    <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                                        <TextBlock
+                                                            Padding="5"
+                                                            HorizontalAlignment="Center"
+                                                            Text="Row" />
+                                                    </StackPanel>
+                                                </DataGridTextColumn.Header>
+                                                <DataGridTextColumn.CellStyle>
+                                                    <Style TargetType="DataGridCell">
+                                                        <Setter Property="Background" Value="#EFEFEF" />
+                                                        <Setter Property="Padding" Value="4,2,2,2" />
+                                                    </Style>
+                                                </DataGridTextColumn.CellStyle>
+                                            </DataGridTextColumn>
+
+                                            <!--  Rebar Diameter  -->
+                                            <DataGridTextColumn Width="100" Binding="{Binding RebarDia, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}">
+                                                <DataGridTextColumn.Header>
+                                                    <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                                        <TextBlock HorizontalAlignment="Center" Text="Rebar Diameter" />
+                                                        <TextBlock HorizontalAlignment="Center" Text="(mm)" />
+                                                    </StackPanel>
+                                                </DataGridTextColumn.Header>
+                                            </DataGridTextColumn>
+
+
+                                            <!--  Number of Rebars  -->
+                                            <DataGridTextColumn Width="100" Binding="{Binding NumOfRebar, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}">
+                                                <DataGridTextColumn.Header>
+                                                    <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                                        <TextBlock HorizontalAlignment="Center" Text="Number of" />
+                                                        <TextBlock HorizontalAlignment="Center" Text="Rebars" />
+                                                    </StackPanel>
+                                                </DataGridTextColumn.Header>
+                                            </DataGridTextColumn>
+
+                                            <!--  Delta Y or Spacing or chuck  -->
+                                            <DataGridTextColumn Width="*" Binding="{Binding DeltaY, ValidatesOnDataErrors=True}">
+                                                <DataGridTextColumn.Header>
+                                                    <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                                        <TextBlock HorizontalAlignment="Center" Text="Delta Y" />
+                                                    </StackPanel>
+                                                </DataGridTextColumn.Header>
+                                            </DataGridTextColumn>
+
+                                            <!--  Delete  -->
+                                            <DataGridTemplateColumn Width="50">
+                                                <DataGridTemplateColumn.Header>
+                                                    <TextBlock HorizontalAlignment="Center" Text="Delete" />
+                                                </DataGridTemplateColumn.Header>
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Command="Delete" Style="{StaticResource deleteButton}">
+                                                            <Image
+                                                                Width="10"
+                                                                Height="10"
+                                                                Source="Images/trash.png" />
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <Border
+                                        Grid.Row="8"
+                                        Grid.Column="0"
+                                        Margin="40,5,40,5">
+                                        <Button
+                                            Command="{Binding CalculateInertia}"
+                                            Content="Calculate"
+                                            IsEnabled="{Binding calCanExecute}"
+                                            Style="{StaticResource functionButtonStyle}" />
+                                    </Border>
+
+                                    <Border Grid.Row="8" Grid.Column="2">
+                                        <Button
+                                            Margin="40,5,40,5"
+                                            Command="{Binding ClearAll}"
+                                            Content="Clear All"
+                                            Style="{StaticResource ClearButtonStyle}" />
+                                    </Border>
+
+                                    <!--  Controls in Column 2  -->
+                                    <Border
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        CornerRadius="2">
+                                        <ComboBox
+                                            x:Name="section"
+                                            Margin="0,2,5,2"
+                                            Padding="2,2,0,0"
+                                            ItemsSource="{Binding SectionTypeOptions, Mode=OneWay}"
+                                            Loaded="section_Loaded"
+                                            SelectedItem="{Binding SelectedSection}" />
+                                    </Border>
+
+
+                                    <!--  Input fields for rectangular sections  -->
+                                    <Border
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <TextBox
+                                            x:Name="Breadth"
+                                            Padding="2,2,0,0"
+                                            Text="{Binding Breadth, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                                    </Border>
+                                    <Border
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <TextBox
+                                            x:Name="Height"
+                                            Padding="2,2,0,0"
+                                            Text="{Binding Height, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                                    </Border>
+
+                                    <!--  Input field for circular column  -->
+                                    <Border
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
+                                        <TextBox
+                                            x:Name="Radius"
+                                            Padding="2,2,0,0"
+                                            Text="{Binding Radius, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                                    </Border>
+                                    <Border
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
+                                        <TextBox
+                                            x:Name="RebarDia"
+                                            Padding="2,2,0,0"
+                                            Background="#EFEFEF"
+                                            Text="{Binding Diameter, ValidatesOnDataErrors=True}" />
+                                    </Border>
+
+                                    <!-- Alternate Style
+        <Border Visibility="{Binding isRectangularSection,
+            Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0,15,0,15"
+                Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
+            <TextBox IsReadOnly="True" Padding="2 2 0 0" Margin="0,0,5,0"/>
+        </Border>
+                                    -->
+
+                                    <Border
+                                        Grid.Row="4"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0">
+                                        <TextBox Padding="2,2,0,0" Text="{Binding Cover, ValidatesOnDataErrors=True}" />
+                                    </Border>
+
+                                    <!--  Side Cover for rectangular  -->
+                                    <Border
+                                        Grid.Row="5"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        BorderThickness="0"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <TextBox
+                                            x:Name="Side_Cover"
+                                            Padding="2,2,0,0"
+                                            Text="{Binding SideCover, ValidatesOnDataErrors=True}" />
+                                    </Border>
+
+                                    <Border
+                                        Grid.Row="6"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        CornerRadius="2">
+                                        <ComboBox
+                                            x:Name="code"
+                                            Margin="0,2,5,2"
+                                            Padding="2,2,0,0"
+                                            ItemsSource="{Binding CodeOptions, Mode=OneWay}"
+                                            SelectedItem="{Binding SelectedCode}" />
+                                    </Border>
+
+                                    <!--  Labels in Column 2 of Inner Grid  -->
+                                    <Grid
+                                        Grid.Row="9"
+                                        Grid.RowSpan="5"
+                                        Grid.Column="2"
+                                        Margin="0,5,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontFamily="{StaticResource ProductSans}"
+                                            FontWeight="Bold">
+                                            Total Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Total
+                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="2"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Total
+                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                            )</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="3"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Total
+                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                            (mm)</TextBlock>
+                                        <TextBlock
+                                            Grid.Row="4"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold">
+                                            Total
+                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                            (mm)</TextBlock>
+
+                                        <TextBox
+                                            x:Name="TA"
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Margin="0,2,0,2"
+                                            Background="#EFEFEF"
+                                            FontFamily="{StaticResource ProductSans}"
+                                            IsReadOnly="True"
+                                            Text="{Binding TotalArea}" />
+                                        <TextBox
+                                            x:Name="TIX"
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding TotalIx}" />
+                                        <TextBox
+                                            x:Name="TIY"
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding TotalIy}" />
+                                        <TextBox
+                                            x:Name="TRX"
+                                            Grid.Row="3"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding TotalRx}" />
+                                        <TextBox
+                                            x:Name="TRY"
+                                            Grid.Row="4"
+                                            Grid.Column="1"
+                                            Margin="0,0,0,2"
+                                            Background="#EFEFEF"
+                                            IsReadOnly="True"
+                                            Text="{Binding TotalRy}" />
+                                    </Grid>
+
+                                </Grid>
+                            </GroupBox>
+
+                            <!--  Diagram  -->
+                            <GroupBox
+                                Grid.Column="3"
+                                Margin="10,0,0,0"
+                                BorderBrush="#D76F30"
+                                FontWeight="DemiBold"
+                                Header="Diagram">
+                                <Grid>
+                                    <Canvas
+                                        x:Name="Rectangle"
+                                        Width="200"
+                                        Height="200"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}">
+                                        <!--  Rectangle representing the section  -->
+                                        <Rectangle
+                                            Canvas.Left="-1"
+                                            Canvas.Top="-1"
+                                            Width="191"
+                                            Height="191"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="LightGray"
+                                            Stroke="Black"
+                                            StrokeThickness="3" />
+
+                                        <!--  Rebars  -->
+                                        <Ellipse
+                                            Canvas.Left="40"
+                                            Canvas.Top="15"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="95"
+                                            Canvas.Top="15"
+                                            Width="10"
+                                            Height="10"
+                                            Fill="Black"
+                                            RenderTransformOrigin="2.4,0.585" />
+                                        <Ellipse
+                                            Canvas.Left="150"
+                                            Canvas.Top="15"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+
+
+                                        <Ellipse
+                                            Canvas.Left="30"
+                                            Canvas.Top="55"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="95"
+                                            Canvas.Top="55"
+                                            Width="10"
+                                            Height="10"
+                                            Fill="Black"
+                                            RenderTransformOrigin="2.4,0.585" />
+                                        <Ellipse
+                                            Canvas.Left="160"
+                                            Canvas.Top="55"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+
+                                        <!--  Side Cover  -->
+                                        <Line
+                                            Canvas.Left="-8"
+                                            Canvas.Top="45"
+                                            Width="124"
+                                            Height="15"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="10"
+                                            X2="10"
+                                            Y1="0"
+                                            Y2="50">
+                                            <Line.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform />
+                                                    <SkewTransform AngleX="-0.597" />
+                                                    <RotateTransform />
+                                                    <TranslateTransform X="-0.115" />
+                                                </TransformGroup>
+                                            </Line.RenderTransform>
+                                        </Line>
+                                        <Line
+                                            Canvas.Left="1"
+                                            Canvas.Top="34"
+                                            Width="34"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="45"
+                                            X2="0"
+                                            Y1="20"
+                                            Y2="20" />
+
+                                        <!--  Cover  -->
+                                        <Line
+                                            Canvas.Left="10"
+                                            Canvas.Top="2.5"
+                                            Width="106"
+                                            Height="17"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="105"
+                                            X2="105"
+                                            Y1="0"
+                                            Y2="25" />
+                                        <Line
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="120"
+                                            X2="100"
+                                            Y1="2"
+                                            Y2="2" />
+                                        <Line
+                                            Canvas.Top="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="120"
+                                            X2="100"
+                                            Y1="10"
+                                            Y2="10" />
+                                        <TextBlock
+                                            Canvas.Left="121"
+                                            Canvas.Top="5"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            FontSize="10"
+                                            Foreground="Blue"
+                                            RenderTransformOrigin="-13.01,-5.753"
+                                            Text="Cover" />
+
+
+                                        <!--  Coordinate axes  -->
+                                        <Line
+                                            Stroke="Green"
+                                            StrokeThickness="2"
+                                            X1="0"
+                                            X2="0"
+                                            Y1="0"
+                                            Y2="100" />
+                                        <Line
+                                            Canvas.Left="-1"
+                                            Width="101"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Stroke="Red"
+                                            StrokeThickness="2"
+                                            X1="100"
+                                            X2="0"
+                                            Y1="0"
+                                            Y2="0" />
+
+                                        <!--  X axis label  -->
+                                        <TextBlock
+                                            Canvas.Left="67"
+                                            Canvas.Top="-21"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Foreground="Red"
+                                            RenderTransformOrigin="-13.01,-5.753"
+                                            Text="X" />
+                                        <!--  Y axis label  -->
+                                        <TextBlock
+                                            Canvas.Left="-13"
+                                            Canvas.Top="69"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Foreground="Green"
+                                            Text="Y" />
+                                        <TextBlock
+                                            Canvas.Left="4"
+                                            Canvas.Top="66"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            Foreground="Blue"
+                                            RenderTransformOrigin="-13.01,-5.753"><Run Text=" Side" /><LineBreak /><Run Text="Cover" /></TextBlock>
+                                        <Line
+                                            Canvas.Left="25"
+                                            Canvas.Top="45"
+                                            Width="124"
+                                            Height="15"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="10"
+                                            X2="10"
+                                            Y1="0"
+                                            Y2="50">
+                                            <Line.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform />
+                                                    <SkewTransform AngleX="-0.597" />
+                                                    <RotateTransform />
+                                                    <TranslateTransform X="-0.115" />
+                                                </TransformGroup>
+                                            </Line.RenderTransform>
+                                        </Line>
+
+                                    </Canvas>
+
+                                    <Canvas
+                                        x:Name="Circle"
+                                        Width="200"
+                                        Height="200"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}">
+                                        <!--  Circle representing the section  -->
+                                        <Ellipse
+                                            Canvas.Left="-1"
+                                            Canvas.Top="-1"
+                                            Width="200"
+                                            Height="200"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="LightGray"
+                                            Stroke="Black"
+                                            StrokeThickness="3" />
+
+                                        <!--  Rebars  -->
+                                        <Ellipse
+                                            Canvas.Left="40"
+                                            Canvas.Top="25"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="95"
+                                            Canvas.Top="10"
+                                            Width="10"
+                                            Height="10"
+                                            Fill="Black"
+                                            RenderTransformOrigin="2.4,0.585" />
+                                        <Ellipse
+                                            Canvas.Left="150"
+                                            Canvas.Top="25"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+
+
+                                        <!--  Cover  -->
+                                        <Line
+                                            Canvas.Left="10"
+                                            Canvas.Top="2"
+                                            Width="106"
+                                            Height="13"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="105"
+                                            X2="105"
+                                            Y1="0"
+                                            Y2="15" />
+                                        <Line
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="120"
+                                            X2="100"
+                                            Y1="2"
+                                            Y2="2" />
+                                        <Line
+                                            Canvas.Top="13"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Stroke="White"
+                                            StrokeThickness="1.5"
+                                            X1="120"
+                                            X2="100"
+                                            Y1="2"
+                                            Y2="2" />
+                                        <TextBlock
+                                            Canvas.Left="121"
+                                            Canvas.Top="2"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            Foreground="Blue"
+                                            RenderTransformOrigin="-13.01,-5.753"
+                                            Text="Cover" />
+
+
+                                        <!--  Coordinate axes  -->
+                                        <Line
+                                            Stroke="Green"
+                                            StrokeThickness="2"
+                                            X1="100"
+                                            X2="100"
+                                            Y1="0"
+                                            Y2="100" />
+                                        <Line
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Stroke="Red"
+                                            StrokeThickness="2"
+                                            X1="100"
+                                            X2="200"
+                                            Y1="0"
+                                            Y2="0" />
+
+                                        <!--  X axis label  -->
+                                        <TextBlock
+                                            Canvas.Left="192"
+                                            Canvas.Top="-21"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Foreground="Red"
+                                            RenderTransformOrigin="-13.01,-5.753"
+                                            Text="X" />
+                                        <!--  Y axis label  -->
+                                        <TextBlock
+                                            Canvas.Left="87"
+                                            Canvas.Top="71"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Foreground="Green"
+                                            RenderTransformOrigin="15.496,0.515"
+                                            Text="Y" />
+                                        <Ellipse
+                                            Canvas.Left="15"
+                                            Canvas.Top="61"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="15"
+                                            Canvas.Top="126"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="40"
+                                            Canvas.Top="163"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="95"
+                                            Canvas.Top="180"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Black"
+                                            RenderTransformOrigin="2.4,0.585" />
+                                        <Ellipse
+                                            Canvas.Left="150"
+                                            Canvas.Top="163"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="175"
+                                            Canvas.Top="126"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="175"
+                                            Canvas.Top="61"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Fill="Black" />
+                                        <Ellipse
+                                            Canvas.Left="8"
+                                            Canvas.Top="94"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Fill="Black"
+                                            RenderTransformOrigin="-0.133,0.589" />
+                                        <Ellipse
+                                            Canvas.Left="182"
+                                            Canvas.Top="94"
+                                            Width="10"
+                                            Height="10"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Fill="Black"
+                                            RenderTransformOrigin="-0.133,0.589" />
+
+                                    </Canvas>
+
+
+                                </Grid>
+                            </GroupBox>
 
                         </Grid>
+                    </TabItem>
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Future Additions" />
+                            </StackPanel>
+                        </TabItem.Header>
+                    </TabItem>
+                </TabControl>
 
-
-                        <!--Table in Column 0 of Inner Grid-->
-                        <DataGrid Grid.Row="6" Grid.ColumnSpan="3" Margin="10,10,10,10" 
-                              CanUserAddRows="True" CanUserDeleteRows="True" 
-                              VerticalGridLinesBrush="AliceBlue"
-                              GridLinesVisibility="Vertical"
-                              IsReadOnly="False" AutoGenerateColumns="False"
-                              ItemsSource="{Binding Entries}" HeadersVisibility="Column"
-                              EnableRowVirtualization="False"
-                              FontStyle="Normal" Foreground="Black"
-                              SelectionMode="Single"
-                              Background="White">
-
-                            <DataGrid.Resources>
-                                <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#A7BC5B"/>
-                                </Style>
-                            </DataGrid.Resources>
-                            <DataGrid.ColumnHeaderStyle>
-                                <StaticResource ResourceKey="ColumnHeaderStyle" />
-                            </DataGrid.ColumnHeaderStyle>
-                            
-                            <!--Row Number-->
-                            <DataGrid.Columns>
-                                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Count, ValidatesOnDataErrors=True}" Width="*">
-                                    <DataGridTextColumn.Header>
-                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                            <TextBlock Padding="5" Text="Row" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataGridTextColumn.Header>
-                                    <DataGridTextColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="Background" Value="#EFEFEF" />
-                                            <Setter Property="Padding" Value="4,2,2,2" />
-                                        </Style>
-                                    </DataGridTextColumn.CellStyle>
-                                </DataGridTextColumn>
-
-                                <!--Rebar Diameter-->
-                                <DataGridTextColumn Binding="{Binding Dia, ValidatesOnDataErrors=True}" Width="100">
-                                    <DataGridTextColumn.Header>
-                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                            <TextBlock Text="Rebar Diameter" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="(mm&#x00B2;)" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataGridTextColumn.Header>
-                                </DataGridTextColumn>
-                                   
-
-                                <!--Number of Rebars-->
-                                <DataGridTextColumn Binding="{Binding Num, ValidatesOnDataErrors=True}" Width="100">
-                                    <DataGridTextColumn.Header>
-                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                            <TextBlock Text="Number of" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="Rebars" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataGridTextColumn.Header>
-                                </DataGridTextColumn>
-
-                                <!--Delta Y or Spacing or chuck-->
-                                <DataGridTextColumn Binding="{Binding DeltaY, ValidatesOnDataErrors=True}" Width="*">
-                                    <DataGridTextColumn.Header>
-                                        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                            <TextBlock Text="Delta Y" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataGridTextColumn.Header>
-                                </DataGridTextColumn>
-
-                                <!--Delete-->
-                                <DataGridTemplateColumn Header="Delete" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="Delete" Command="Delete"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-
-                        <Button Content="Calculate" IsEnabled="{Binding Flag}" Command ="{Binding Calculate}" 
-                                Grid.Row="7" Grid.Column="0" Margin ="30,10,30,10" 
-                                Background="#849531" Foreground="AntiqueWhite" 
-                                />
-                        <Button Content="Clear All" Command ="{Binding ClearAll}" Grid.Row="7" Grid.Column="2" Margin ="30,10,30,10" Background="#849531" Foreground="AntiqueWhite"/>
-
-                        <!--Controls in Column 2 -->
-                        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" CornerRadius="2">
-                            <ComboBox x:Name="section" Margin="0 2 5 2"  Padding="2 2 0 0"  
-                              Loaded="section_Loaded"
-                              SelectedItem="{Binding MySelectedItem}" >
-                                <ComboBoxItem Tag="CC">Circular Column</ComboBoxItem>
-                                <ComboBoxItem Tag="RC">Rectangular Column</ComboBoxItem>
-                                <ComboBoxItem Tag="RB">Rectangular Beam</ComboBoxItem>
-                            </ComboBox>
-                        </Border>
-
-
-                        <!--Input fields for rectangular sections-->
-                        <Border Visibility="{Binding Option, 
-                        Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                            Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Breadth" Text="{Binding Breadth, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
-                        </Border>
-                        <Border Visibility="{Binding Option, 
-                        Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                            Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Height" Text="{Binding Height, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
-                        </Border>
-
-                        <!--Input field for circular column-->
-                        <Border Visibility="{Binding Option, 
-                        Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                            Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Radius" Padding="2 2 0 0" Text="{Binding Radius, ValidatesOnDataErrors=True}" />
-                        </Border>
-                        <Border Visibility="{Binding Option, 
-                        Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                            Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Dia" Background="#EFEFEF" Padding="2 2 0 0" Text="{Binding Diameter, ValidatesOnDataErrors=True}"/>
-                        </Border>
-
-                        <!-- Alternate Style
-                    <Border Visibility="{Binding Option, 
-                        Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0,15,0,15"  
-                            Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                        <TextBox IsReadOnly="True" Padding="2 2 0 0" Margin="0,0,5,0"/>
-                    </Border>
-                    -->
-
-                        <Border Margin="0 2 5 2"  Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox Padding="2 2 0 0" Text="{Binding Cover, ValidatesOnDataErrors=True}"/>
-                        </Border>
-
-                        <!--Side Cover for rectangular-->
-                        <Border Visibility="{Binding Option, 
-                         Converter={StaticResource booleanToVisibilityConverter}}" Margin="0 2 5 2"  
-                             Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-                            <TextBox x:Name="Side_Cover" Text="{Binding SideCover, ValidatesOnDataErrors=True}" Padding="2 2 0 0"/>
-                        </Border>
-
-                        <!-- Labels in Column 2 of Inner Grid -->
-                        <Grid Grid.Column="2" Grid.Row="8" Grid.RowSpan="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                                <RowDefinition Height="30"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="0" 
-                                   FontWeight="Bold">
-                                Total Area (mm<Run FontSize="7pt" BaselineAlignment="TextTop">2</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="0" FontWeight="Bold"> Total
-                                I<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run>
-                                (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" FontWeight="Bold"> Total
-                                I<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run>
-                                (mm<Run FontSize="7pt" BaselineAlignment="TextTop">4</Run>)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="0" FontWeight="Bold"> Total
-                                r<Run FontSize="7pt" BaselineAlignment="TextBottom">x</Run> (mm)
-                            </TextBlock>
-                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="4" Grid.Column="0" FontWeight="Bold"> Total
-                            r<Run FontSize="7pt" BaselineAlignment="TextBottom">y</Run> (mm)
-                            </TextBlock>
-
-                            <TextBox x:Name="TA" Text="{Binding TotalArea}" IsReadOnly="True" FontFamily="{StaticResource ProductSans}" Grid.Row="0" Grid.Column="1" 
-                                   Background="#EFEFEF" Margin="0 2 0 2"/>
-                            <TextBox x:Name="TIX" Text="{Binding TotalIx}" IsReadOnly="True" Grid.Row="1" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
-                            <TextBox x:Name="TIY" Text="{Binding TotalIy}" IsReadOnly="True" Grid.Row="2" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
-                            <TextBox x:Name="TRX" Text="{Binding TotalRx}" IsReadOnly="True" Grid.Row="3" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
-                            <TextBox x:Name="TRY" Text="{Binding TotalRy}" IsReadOnly="True" Grid.Row="4" Grid.Column="1" Background="#EFEFEF" Margin="0 0 0 2" />
-                        </Grid>
-                        
-                    </Grid>
-                </GroupBox>
-
-                <!--Diagram-->
-                <GroupBox Margin="10 0 0 0" Grid.Column="3" Header="Diagram" FontWeight="DemiBold" BorderBrush="#D76F30">
-                    <Grid>
-                        <Canvas x:Name="Rectangle" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}" Width="200" Height="200">
-                            <!-- Rectangle representing the section -->
-                            <Rectangle Width="191" Height="191" Stroke="Black" StrokeThickness="3" Fill="LightGray" HorizontalAlignment="Center" Canvas.Left="-1" Canvas.Top="-1" VerticalAlignment="Center"/>
-
-                            <!-- Rebars -->
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="40" Canvas.Top="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="95" Canvas.Top="15" RenderTransformOrigin="2.4,0.585"/>
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="150" Canvas.Top="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                            <!-- Coordinate axes -->
-                            <Line X1="0" Y1="0" X2="0" Y2="100" Stroke="Green" StrokeThickness="2"/>
-                            <Line X1="100" Y1="0" X2="0" Y2="0" Stroke="Red" StrokeThickness="2" HorizontalAlignment="Center" Canvas.Left="-1" VerticalAlignment="Center" Width="101"/>
-
-                            <!-- X axis label -->
-                            <TextBlock Text="X" Foreground="Red" Canvas.Left="93" Canvas.Top="-21" RenderTransformOrigin="-13.01,-5.753"/>
-                            <!-- Y axis label -->
-                            <TextBlock Text="Y" Foreground="Green" Canvas.Left="-18" Canvas.Top="84"/>
-                        </Canvas>
-
-                        <Canvas x:Name="Circle" Visibility="{Binding Option, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}" Width="200" Height="200">
-                            <!-- Circle representing the section -->
-                            <Ellipse Width="200" Height="200" Stroke="Black" StrokeThickness="3" Fill="LightGray" HorizontalAlignment="Center" Canvas.Left="-1" Canvas.Top="-1" VerticalAlignment="Center"/>
-
-                            <!-- Rebars -->
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="40" Canvas.Top="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="95" Canvas.Top="0" RenderTransformOrigin="2.4,0.585"/>
-                            <Ellipse Width="10" Height="10" Fill="Black" Canvas.Left="150" Canvas.Top="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                            <!-- Coordinate axes -->
-                            <Line X1="100" Y1="0" X2="100" Y2="100" Stroke="Green" StrokeThickness="2"/>
-                            <Line X1="100" Y1="0" X2="200" Y2="0" Stroke="Red" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                            <!-- X axis label -->
-                            <TextBlock Text="X" Foreground="Red" Canvas.Left="192" Canvas.Top="-21" RenderTransformOrigin="-13.01,-5.753" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <!-- Y axis label -->
-                            <TextBlock Text="Y" Foreground="Green" Canvas.Left="87" Canvas.Top="83" RenderTransformOrigin="15.496,0.515"/>
-                        </Canvas>
-                    </Grid>
-                </GroupBox>
 
             </Grid>
 
