@@ -1,44 +1,77 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace WpfApp1
 {
-    class CircularColumn
+    class CircularSections : Sections
     {
-        public void Inertia_Cal()
+        public override double[] RebarInertiaCal(double radiusOfColumn, double StirrupThickness, ObservableCollection<Rebars> userInputtedRebars, double cover)
         {
-            double A_rebar = 0;
-            double Ix = 0;
-            double Iy = 0;
+            double rebarIx = 0;
+            double rebarIy = 0;
+            double totalAreaOfRebars = 0;
+            int countOfOfRebarsInTheWholeSection = 0;
 
-            if (_radius != 0 && user_int is not null)
+            foreach (var item in userInputtedRebars)
             {
-                foreach (var item in user_int)
-                {
-                    double radius_Rebar = item.Dia / 2;
-                    A_rebar = PI * Math.Pow(radius_Rebar, 2);
-                    double slice = (2 * Math.PI) / item.Num;
+                countOfOfRebarsInTheWholeSection+= item.NumOfRebar;
+            }
 
-                    for (int i = 0; i < item.Num; i++)
+            Coordinates[] rebarsCoordinates = new Coordinates[countOfOfRebarsInTheWholeSection];
+
+            if (radiusOfColumn != 0 && userInputtedRebars is not null)
+            {
+                int j = 0;
+                foreach (var item in userInputtedRebars)
+                {
+
+                    double areaOfRebar = CalcRebarArea(item.RebarDia);
+                    double slice = (2 * Math.PI) / item.NumOfRebar; //radians
+                    
+                    for (int i = 0; i < item.NumOfRebar; i++)
                     {
                         double angle = slice * i;
-                        double x = (_radius - item.DeltaY) * Math.Cos(angle);
-                        double y = (_radius - item.DeltaY) * Math.Sin(angle);
-                        Ix += ((PI * Math.Pow(item.Dia, 4)) / 64) + (A_rebar * Math.Pow(x, 2));
-                        Iy += ((PI * Math.Pow(item.Dia, 4)) / 64) + (A_rebar * Math.Pow(y, 2));
+                        double x = (radiusOfColumn - (cover + item.DeltaY + StirrupThickness + item.RebarDia / 2)) * Math.Cos(angle);
+                        double y = (radiusOfColumn - (cover + item.DeltaY + StirrupThickness + item.RebarDia / 2)) * Math.Sin(angle);
+                        rebarsCoordinates[j] = new Coordinates(x, y, item.RebarDia);
+                        rebarIx += ((PI * Math.Pow(item.RebarDia, 4)) / 64) + (areaOfRebar * Math.Pow(x, 2));
+                        rebarIy += ((PI * Math.Pow(item.RebarDia, 4)) / 64) + (areaOfRebar * Math.Pow(y, 2));
+                        j++;
                     }
 
+                    totalAreaOfRebars += areaOfRebar;
+
+                }
+
+                if (countOfOfRebarsInTheWholeSection > 2)
+                {
+                    for (int i = 0; i < countOfOfRebarsInTheWholeSection - 1; i++)
+                    {
+                        double diff_x = rebarsCoordinates[i].x_coordinate - rebarsCoordinates[i + 1].x_coordinate;
+                        double diff_y = rebarsCoordinates[i].y_coordinate - rebarsCoordinates[i + 1].y_coordinate;
+                        double sum_radius = rebarsCoordinates[i].radius + rebarsCoordinates[i + 1].radius;
+                        if ((Math.Pow(diff_x, 2) + Math.Pow(diff_y, 2)) < Math.Pow(sum_radius, 2))
+                        {
+                            return [-1, -1, -1];
+                        }
+                    }
                 }
             }
 
-            RebarRx = Math.Round(Ix, 5);
-            RebarRy = Math.Round(Iy, 2);
-
+            return [Math.Round(rebarIx, 6), Math.Round(rebarIy, 6), Math.Round(totalAreaOfRebars, 6)];
         }
 
+        public override double[] TotalInertiaCal(double diameterOfColumn)
+        {
+            double totalIx = PI * Math.Pow(diameterOfColumn, 4)/64;
+            double totalIy = PI * Math.Pow(diameterOfColumn, 4) / 64;
 
+            return [Math.Round(totalIx, 6), Math.Round(totalIy, 6)];
+        }
     }
+
 }
