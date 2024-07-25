@@ -11,10 +11,10 @@
     xmlns:vm="clr-namespace:WpfApp1"
     x:Name="AppWindow"
     Title="Inertia Calculator"
-    Width="855"
-    Height="650"
-    MinWidth="700"
-    MinHeight="200"
+    Width="1000"
+    Height="700"
+    MinWidth="1000"
+    MinHeight="700"
     d:DataContext="{d:DesignInstance Type=vm:WindowViewModel}"
     Icon="Resources/logo.png"
     ResizeMode="CanResizeWithGrip"
@@ -271,9 +271,9 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="1.5*" />
                                 <ColumnDefinition Width="10" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="370" />
                                 <ColumnDefinition Width="10" />
                             </Grid.ColumnDefinitions>
 
@@ -378,7 +378,7 @@
                                     <Label
                                         Grid.Row="6"
                                         Grid.Column="0"
-                                        Content="Spacing (mm)"
+                                        Content="Stirrup Thickness (mm)"
                                         FontFamily="{StaticResource ProductSans}"
                                         FontWeight="Bold"
                                         Foreground="{DynamicResource ForeGroundColor}" />
@@ -715,14 +715,32 @@
                                         Grid.Row="6"
                                         Grid.Column="1"
                                         Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
                                         CornerRadius="2">
-                                        <ComboBox
-                                            x:Name="code"
-                                            Margin="0,2,5,2"
-                                            Padding="2,2,0,0"
-                                            ItemsSource="{Binding CodeOptions, Mode=OneWay}"
-                                            SelectedItem="{Binding SelectedCode}"
-                                            Style="{DynamicResource DefaultComboBoxStyle}" />
+                                        <ListBox
+                                            BorderThickness="0"
+                                            ItemsSource="{Binding StirrupThicknessOptions}"
+                                            SelectedItem="{Binding SelectedStirrupThickness}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="{x:Type ListBoxItem}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                                <RadioButton
+                                                                    Margin="0,0,10,0"
+                                                                    Content="{TemplateBinding Content}"
+                                                                    IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected}" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                        </ListBox>
                                     </Border>
 
                                     <!--  Labels in Column 2 of Inner Grid  -->
@@ -843,431 +861,90 @@
                             </GroupBox>
 
                             <!--  Diagram  -->
-                            <GroupBox
-                                Grid.Column="3"
-                                Margin="10,0,0,0"
-                                BorderBrush="{DynamicResource DataGridBorderColor}"
-                                FontWeight="DemiBold"
-                                Foreground="{DynamicResource ForeGroundColor}"
-                                Header="Diagram">
-                                <Grid>
-                                    <Canvas
-                                        x:Name="Rectangle"
-                                        Width="200"
-                                        Height="200"
-                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource booleanToVisibilityConverter}}">
-                                        <!--  Rectangle representing the section  -->
-                                        <Rectangle
-                                            Canvas.Left="-1"
-                                            Canvas.Top="-1"
-                                            Width="191"
-                                            Height="191"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="{DynamicResource FiltersBackgroundColor}"
-                                            Stroke="Black"
-                                            StrokeThickness="3" />
+                            <Grid Grid.Column="3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="100" />
+                                </Grid.RowDefinitions>
+                                <GroupBox
+                                    Grid.Row="0"
+                                    Margin="10,0,0,10"
+                                    BorderBrush="{DynamicResource DataGridBorderColor}"
+                                    FontWeight="DemiBold"
+                                    Foreground="{DynamicResource ForeGroundColor}"
+                                    Header="Diagram">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="350" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Image
+                                                Grid.Column="1"
+                                                Margin="3,-22,-4,-29"
+                                                Source="Resources/Circular-Image.png"
+                                                Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
+                                            <Image
+                                                Grid.ColumnSpan="2"
+                                                Margin="173,-18,-24,-30"
+                                                Source="Resources/Rectangular-Image.png"
+                                                Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}" />
 
-                                        <!--  Rebars  -->
-                                        <Ellipse
-                                            Canvas.Left="40"
-                                            Canvas.Top="15"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="95"
-                                            Canvas.Top="15"
-                                            Width="10"
-                                            Height="10"
-                                            Fill="Black"
-                                            RenderTransformOrigin="2.4,0.585" />
-                                        <Ellipse
-                                            Canvas.Left="150"
-                                            Canvas.Top="15"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
+                                        </Grid>
+                                        <Grid Grid.Row="1">
+                                            <Canvas x:Name="myCanvas">
+                                                <ItemsControl ItemsSource="{Binding RebarsForCanvas}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <Canvas />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                            </Canvas>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
 
-
-                                        <Ellipse
-                                            Canvas.Left="30"
-                                            Canvas.Top="55"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="95"
-                                            Canvas.Top="55"
-                                            Width="10"
-                                            Height="10"
-                                            Fill="Black"
-                                            RenderTransformOrigin="2.4,0.585" />
-                                        <Ellipse
-                                            Canvas.Left="160"
-                                            Canvas.Top="55"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-
-                                        <!--  Side Cover  -->
-                                        <Line
-                                            Canvas.Left="-8"
-                                            Canvas.Top="45"
-                                            Width="124"
-                                            Height="15"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="10"
-                                            X2="10"
-                                            Y1="0"
-                                            Y2="50">
-                                            <Line.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform />
-                                                    <SkewTransform AngleX="-0.597" />
-                                                    <RotateTransform />
-                                                    <TranslateTransform X="-0.115" />
-                                                </TransformGroup>
-                                            </Line.RenderTransform>
-                                        </Line>
-                                        <Line
-                                            Canvas.Left="1"
-                                            Canvas.Top="34"
-                                            Width="34"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="45"
-                                            X2="0"
-                                            Y1="20"
-                                            Y2="20" />
-
-                                        <!--  Cover  -->
-                                        <Line
-                                            Canvas.Left="10"
-                                            Canvas.Top="2.5"
-                                            Width="106"
-                                            Height="17"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="105"
-                                            X2="105"
-                                            Y1="0"
-                                            Y2="25" />
-                                        <Line
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="120"
-                                            X2="100"
-                                            Y1="2"
-                                            Y2="2" />
-                                        <Line
-                                            Canvas.Top="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="120"
-                                            X2="100"
-                                            Y1="10"
-                                            Y2="10" />
-                                        <TextBlock
-                                            Canvas.Left="121"
-                                            Canvas.Top="5"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            FontSize="10"
-                                            Foreground="Blue"
-                                            RenderTransformOrigin="-13.01,-5.753"
-                                            Text="Cover" />
-
-
-                                        <!--  Coordinate axes  -->
-                                        <Line
-                                            Stroke="Green"
-                                            StrokeThickness="2"
-                                            X1="0"
-                                            X2="0"
-                                            Y1="0"
-                                            Y2="100" />
-                                        <Line
-                                            Canvas.Left="-1"
-                                            Width="101"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Stroke="Red"
-                                            StrokeThickness="2"
-                                            X1="100"
-                                            X2="0"
-                                            Y1="0"
-                                            Y2="0" />
-
-                                        <!--  X axis label  -->
-                                        <TextBlock
-                                            Canvas.Left="67"
-                                            Canvas.Top="-21"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Foreground="Red"
-                                            RenderTransformOrigin="-13.01,-5.753"
-                                            Text="X" />
-                                        <!--  Y axis label  -->
-                                        <TextBlock
-                                            Canvas.Left="-13"
-                                            Canvas.Top="69"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Foreground="Green"
-                                            Text="Y" />
-                                        <TextBlock
-                                            Canvas.Left="4"
-                                            Canvas.Top="66"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="10"
-                                            Foreground="Blue"
-                                            RenderTransformOrigin="-13.01,-5.753"><Run Text=" Side" /><LineBreak /><Run Text="Cover" /></TextBlock>
-                                        <Line
-                                            Canvas.Left="25"
-                                            Canvas.Top="45"
-                                            Width="124"
-                                            Height="15"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="10"
-                                            X2="10"
-                                            Y1="0"
-                                            Y2="50">
-                                            <Line.RenderTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform />
-                                                    <SkewTransform AngleX="-0.597" />
-                                                    <RotateTransform />
-                                                    <TranslateTransform X="-0.115" />
-                                                </TransformGroup>
-                                            </Line.RenderTransform>
-                                        </Line>
-
-                                    </Canvas>
-
-                                    <Canvas
-                                        x:Name="Circle"
-                                        Width="200"
-                                        Height="200"
-                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource inversebooleanToVisibilityConverter}}">
-                                        <!--  Circle representing the section  -->
-                                        <Ellipse
-                                            Canvas.Left="-1"
-                                            Canvas.Top="-1"
-                                            Width="200"
-                                            Height="200"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="{DynamicResource FiltersBackgroundColor}"
-                                            Stroke="Black"
-                                            StrokeThickness="3" />
-
-                                        <!--  Rebars  -->
-                                        <Ellipse
-                                            Canvas.Left="40"
-                                            Canvas.Top="25"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="95"
-                                            Canvas.Top="10"
-                                            Width="10"
-                                            Height="10"
-                                            Fill="Black"
-                                            RenderTransformOrigin="2.4,0.585" />
-                                        <Ellipse
-                                            Canvas.Left="150"
-                                            Canvas.Top="25"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-
-
-                                        <!--  Cover  -->
-                                        <Line
-                                            Canvas.Left="10"
-                                            Canvas.Top="2"
-                                            Width="106"
-                                            Height="13"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="105"
-                                            X2="105"
-                                            Y1="0"
-                                            Y2="15" />
-                                        <Line
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="120"
-                                            X2="100"
-                                            Y1="2"
-                                            Y2="2" />
-                                        <Line
-                                            Canvas.Top="13"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Stroke="White"
-                                            StrokeThickness="1.5"
-                                            X1="120"
-                                            X2="100"
-                                            Y1="2"
-                                            Y2="2" />
-                                        <TextBlock
-                                            Canvas.Left="121"
-                                            Canvas.Top="2"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            FontSize="10"
-                                            Foreground="Blue"
-                                            RenderTransformOrigin="-13.01,-5.753"
-                                            Text="Cover" />
-
-
-                                        <!--  Coordinate axes  -->
-                                        <Line
-                                            Stroke="Green"
-                                            StrokeThickness="2"
-                                            X1="100"
-                                            X2="100"
-                                            Y1="0"
-                                            Y2="100" />
-                                        <Line
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Stroke="Red"
-                                            StrokeThickness="2"
-                                            X1="100"
-                                            X2="200"
-                                            Y1="0"
-                                            Y2="0" />
-
-                                        <!--  X axis label  -->
-                                        <TextBlock
-                                            Canvas.Left="192"
-                                            Canvas.Top="-21"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Foreground="Red"
-                                            RenderTransformOrigin="-13.01,-5.753"
-                                            Text="X" />
-                                        <!--  Y axis label  -->
-                                        <TextBlock
-                                            Canvas.Left="87"
-                                            Canvas.Top="71"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Foreground="Green"
-                                            RenderTransformOrigin="15.496,0.515"
-                                            Text="Y" />
-                                        <Ellipse
-                                            Canvas.Left="15"
-                                            Canvas.Top="61"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Top"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="15"
-                                            Canvas.Top="126"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="40"
-                                            Canvas.Top="163"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="95"
-                                            Canvas.Top="180"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Fill="Black"
-                                            RenderTransformOrigin="2.4,0.585" />
-                                        <Ellipse
-                                            Canvas.Left="150"
-                                            Canvas.Top="163"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="175"
-                                            Canvas.Top="126"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="175"
-                                            Canvas.Top="61"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Fill="Black" />
-                                        <Ellipse
-                                            Canvas.Left="8"
-                                            Canvas.Top="94"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Fill="Black"
-                                            RenderTransformOrigin="-0.133,0.589" />
-                                        <Ellipse
-                                            Canvas.Left="182"
-                                            Canvas.Top="94"
-                                            Width="10"
-                                            Height="10"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Fill="Black"
-                                            RenderTransformOrigin="-0.133,0.589" />
-
-                                    </Canvas>
-
-
-                                </Grid>
-                            </GroupBox>
+                                <GroupBox
+                                    Grid.Row="1"
+                                    Margin="10,0,0,10"
+                                    BorderBrush="{DynamicResource DataGridBorderColor}"
+                                    FontWeight="DemiBold"
+                                    Foreground="{DynamicResource ForeGroundColor}"
+                                    Header="Errors">
+                                    <Grid>
+                                        <Label Content="{Binding ErrorMessage}" />
+                                        <!--<Expander HorizontalContentAlignment="Stretch">
+                                            <Expander.Header>
+                                                <BulletDecorator>
+                                                    <BulletDecorator.Bullet>
+                                                        <Image Width="10" Source="Resources/logo.png" />
+                                                    </BulletDecorator.Bullet>
+                                                    <TextBlock Margin="10,0,0,0">Error List</TextBlock>
+                                                </BulletDecorator>
+                                            </Expander.Header>
+                                            <Expander.Content>
+                                                <ScrollViewer Height="50">
+                                                    <TextBlock TextWrapping="Wrap">
+                                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                                                        sed do eiusmod tempor incididunt ut labore et dolore magna
+                                                        aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                                                        ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                        Duis aute irure dolor in reprehenderit in voluptate velit
+                                                        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                                                        occaecat cupidatat non proident, sunt in culpa qui officia
+                                                        deserunt mollit anim id est laborum.
+                                                    </TextBlock>
+                                                </ScrollViewer>
+                                            </Expander.Content>
+                                        </Expander>-->
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
 
                         </Grid>
                     </TabItem>
