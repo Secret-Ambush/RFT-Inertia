@@ -28,13 +28,15 @@ namespace WpfApp1
                 int j = 0;
                 foreach (var item in userInputtedRebars)
                 {
-                    double spacing = (width + 2 * sidecover) / item.NumOfRebar;
+                    double rebarRadius = item.RebarDia / 2;
+                    double spaceForRebarPlacement = width - 2 * (sidecover + StirrupThickness);
+                    double spacing = (spaceForRebarPlacement - 2 * rebarRadius) / (item.NumOfRebar - 1);
                     double areaOfRebar = CalcRebarArea(item.RebarDia);
                     
                     for (int i = 0; i < item.NumOfRebar; i++)
                     {
-                        double x = sidecover + (i * spacing);
-                        double y = cover + item.DeltaY;
+                        double x = sidecover + StirrupThickness + (i * spacing);
+                        double y = cover + StirrupThickness + item.DeltaY;
                         rebarIx += ((PI * Math.Pow(item.RebarDia, 4)) / 64) + (areaOfRebar * Math.Pow(x, 2));
                         rebarIy += ((PI * Math.Pow(item.RebarDia, 4)) / 64) + (areaOfRebar * Math.Pow(y, 2));
                         rebarsCoordinates[j] = new Coordinates(x, y, item.RebarDia);
