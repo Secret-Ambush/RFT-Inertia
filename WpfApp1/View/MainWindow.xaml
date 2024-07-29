@@ -378,10 +378,19 @@
                                     <Label
                                         Grid.Row="6"
                                         Grid.Column="0"
-                                        Content="Stirrup Thickness (mm)"
+                                        Content="Stirrup Diameter (mm)"
                                         FontFamily="{StaticResource ProductSans}"
                                         FontWeight="Bold"
-                                        Foreground="{DynamicResource ForeGroundColor}" />
+                                        Foreground="{DynamicResource ForeGroundColor}"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource booleanToVisibilityConverter}}" />
+                                    <Label
+                                        Grid.Row="5"
+                                        Grid.Column="0"
+                                        Content="Stirrup Diameter (mm)"
+                                        FontFamily="{StaticResource ProductSans}"
+                                        FontWeight="Bold"
+                                        Foreground="{DynamicResource ForeGroundColor}"
+                                        Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
 
                                     <Grid
                                         Grid.Row="9"
@@ -716,9 +725,49 @@
                                         Grid.Column="1"
                                         Grid.ColumnSpan="2"
                                         Margin="0,2,5,2"
-                                        CornerRadius="2">
+                                        CornerRadius="2"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
                                         <ListBox
+                                            Background="{DynamicResource DataGridBackgroundColor}"
+                                            BorderBrush="{DynamicResource DataGridBorderColor}"
                                             BorderThickness="0"
+                                            Foreground="{DynamicResource ForeGroundColor}"
+                                            ItemsSource="{Binding StirrupThicknessOptions}"
+                                            SelectedItem="{Binding SelectedStirrupThickness}">
+                                            <ListBox.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </ListBox.ItemsPanel>
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="{x:Type ListBoxItem}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                                <RadioButton
+                                                                    Margin="0,0,10,0"
+                                                                    Content="{TemplateBinding Content}"
+                                                                    IsChecked="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSelected}" />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                        </ListBox>
+                                    </Border>
+
+                                    <Border
+                                        Grid.Row="5"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0,2,5,2"
+                                        CornerRadius="2"
+                                        Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
+                                        <ListBox
+                                            Background="{DynamicResource DataGridBackgroundColor}"
+                                            BorderBrush="{DynamicResource DataGridBorderColor}"
+                                            BorderThickness="0"
+                                            Foreground="{DynamicResource ForeGroundColor}"
                                             ItemsSource="{Binding StirrupThicknessOptions}"
                                             SelectedItem="{Binding SelectedStirrupThickness}">
                                             <ListBox.ItemsPanel>
@@ -864,11 +913,11 @@
                             <Grid Grid.Column="3">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
-                                    <RowDefinition Height="100" />
+                                    <RowDefinition Height="80" />
                                 </Grid.RowDefinitions>
                                 <GroupBox
                                     Grid.Row="0"
-                                    Margin="10,0,0,10"
+                                    Margin="0,0,0,10"
                                     BorderBrush="{DynamicResource DataGridBorderColor}"
                                     FontWeight="DemiBold"
                                     Foreground="{DynamicResource ForeGroundColor}"
@@ -887,13 +936,12 @@
                                                 Grid.Column="1"
                                                 Margin="3,-22,-4,-29"
                                                 Source="Resources/Circular-Image.png"
-                                                Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
+                                                Visibility="{Binding DisplaySmallCircleGuide, Converter={StaticResource booleanToVisibilityConverter}}" />
                                             <Image
                                                 Grid.ColumnSpan="2"
                                                 Margin="173,-18,-24,-30"
                                                 Source="Resources/Rectangular-Image.png"
-                                                Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}" />
-
+                                                Visibility="{Binding DisplaySmallRectangleGuide, Converter={StaticResource booleanToVisibilityConverter}}" />
                                         </Grid>
                                         <Grid Grid.Row="1">
                                             <Canvas x:Name="myCanvas">
@@ -905,45 +953,56 @@
                                                     </ItemsControl.ItemsPanel>
                                                 </ItemsControl>
                                             </Canvas>
+                                            <Grid>
+                                                <Image
+                                                    Margin="0,-63,0,63"
+                                                    Source="Resources/Circular-Image.png"
+                                                    Visibility="{Binding DisplayCircleGuideIllustration, Converter={StaticResource booleanToVisibilityConverter}}" />
+                                                <Image
+                                                    Margin="0,-89,0,37"
+                                                    Source="Resources/Rectangular-Image.png"
+                                                    Visibility="{Binding DisplayRectangleGuideIllustration, Converter={StaticResource booleanToVisibilityConverter}}" />
+
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox
+                                <Expander
                                     Grid.Row="1"
-                                    Margin="10,0,0,10"
+                                    HorizontalContentAlignment="Stretch"
+                                    Background="#E4003A"
                                     BorderBrush="{DynamicResource DataGridBorderColor}"
                                     FontWeight="DemiBold"
-                                    Foreground="{DynamicResource ForeGroundColor}"
-                                    Header="Errors">
-                                    <Grid>
-                                        <Label Content="{Binding ErrorMessage}" />
-                                        <!--<Expander HorizontalContentAlignment="Stretch">
-                                            <Expander.Header>
-                                                <BulletDecorator>
-                                                    <BulletDecorator.Bullet>
-                                                        <Image Width="10" Source="Resources/logo.png" />
-                                                    </BulletDecorator.Bullet>
-                                                    <TextBlock Margin="10,0,0,0">Error List</TextBlock>
-                                                </BulletDecorator>
-                                            </Expander.Header>
-                                            <Expander.Content>
-                                                <ScrollViewer Height="50">
-                                                    <TextBlock TextWrapping="Wrap">
-                                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                                                        sed do eiusmod tempor incididunt ut labore et dolore magna
-                                                        aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                                                        ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                                                        Duis aute irure dolor in reprehenderit in voluptate velit
-                                                        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-                                                        occaecat cupidatat non proident, sunt in culpa qui officia
-                                                        deserunt mollit anim id est laborum.
-                                                    </TextBlock>
-                                                </ScrollViewer>
-                                            </Expander.Content>
-                                        </Expander>-->
-                                    </Grid>
-                                </GroupBox>
+                                    Foreground="#FFE8C5"
+                                    IsExpanded="True"
+                                    Visibility="{Binding ErrorsVisibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <Expander.Header>
+                                        <BulletDecorator>
+                                            <TextBlock Margin="10,0,0,0">Error List ⚠️</TextBlock>
+                                        </BulletDecorator>
+                                    </Expander.Header>
+                                    <Expander.Content>
+                                        <DataGrid
+                                            AutoGenerateColumns="False"
+                                            Background="#FFE8C5"
+                                            ColumnWidth="*"
+                                            EnableRowVirtualization="False"
+                                            GridLinesVisibility="None"
+                                            HeadersVisibility="None"
+                                            IsReadOnly="True"
+                                            ItemsSource="{Binding ErrorList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            SelectionMode="Single"
+                                            VerticalScrollBarVisibility="Auto">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn
+                                                    Width="*"
+                                                    Binding="{Binding}"
+                                                    Foreground="#C80036" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Expander.Content>
+                                </Expander>
                             </Grid>
 
                         </Grid>
