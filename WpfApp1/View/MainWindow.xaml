@@ -1027,10 +1027,7 @@
                         </TabItem.Header>
                     </TabItem>
                 </TabControl>
-
-
             </Grid>
-
         </Grid>
     </Border>
 
