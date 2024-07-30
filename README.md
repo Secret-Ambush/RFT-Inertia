@@ -1,6 +1,6 @@
 | Rectangular                         | Circular                            |
 | ----------------------------------- | ----------------------------------- |
-|![Screenshot 2024-07-18 090034](https://github.com/user-attachments/assets/ad2b4efc-785a-4303-aa73-33d3892a254d) | ![Screenshot 2024-07-18 085958](https://github.com/user-attachments/assets/cdd215b6-e5d1-4048-a72e-264bb0c83818) | 
-|![Screenshot 2024-07-18 090041](https://github.com/user-attachments/assets/d52a8460-b307-49ef-adbd-e24795ef0def) | ![Screenshot 2024-07-18 090010](https://github.com/user-attachments/assets/65e6dd8b-cf40-4298-bdf9-5727b850e6ff) |
+| ![image](https://github.com/user-attachments/assets/1fb84a7a-23f7-44c5-88d6-ba12ffd52362)| ![Screenshot 2024-07-30 124708](https://github.com/user-attachments/assets/13889dbd-5bdb-492e-b2bc-508fc26f1a3d)| 
+| ![Screenshot 2024-07-30 124659](https://github.com/user-attachments/assets/1f0b6c7a-0c46-4e47-9cde-0dd607a8ee38)| ![Screenshot 2024-07-30 124744](https://github.com/user-attachments/assets/3e42c750-f569-4bec-aa46-b15670240bb1)|
 
 
