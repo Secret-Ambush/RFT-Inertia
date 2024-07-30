@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using WpfApp1;
 
 namespace WpfApp1
 {
-    public class Rebars : WindowViewModel
+    public class Rebars : BaseViewModel
     {
 
         #region Private members
@@ -18,7 +18,8 @@ namespace WpfApp1
         #endregion
 
         #region Public Properties
-
+        public bool isRectangularSection { get; set; }
+        public double cover { get; set; }
         public double RebarDia
         {
             get { return _dia; }
@@ -55,8 +56,11 @@ namespace WpfApp1
         {
             get
             {
+                isRectangularSection = IsRectangularSection?.Invoke() ?? true;
+                cover = GetCover?.Invoke() ?? 0;
+
                 return propName switch
-                {
+                { 
                     nameof(NumOfRebar) => ValidateNumOfRebar(),
                     nameof(DeltaY) => ValidateDeltaY(),
                     nameof(RebarDia) => ValidateRebarDia(),
@@ -72,19 +76,16 @@ namespace WpfApp1
 
             if (NumOfRebar <= 0)
             {
-                HasErrors[6] = true; 
                 UpdateErrorList(nonPositiveError, true);
                 return "Error";
             }
             else if (NumOfRebar < 2)
             {
-                HasErrors[6] = true;
                 UpdateErrorList(lessThanTwoError, true);
                 return "Error";
             }
             else
             {
-                HasErrors[6] = false;
                 UpdateErrorList(nonPositiveError, false);
                 UpdateErrorList(lessThanTwoError, false);
                 return string.Empty;
@@ -92,34 +93,30 @@ namespace WpfApp1
         }
         private string ValidateDeltaY()
         {
-            var radius = GetMinimumDimension?.Invoke() ?? 0; // holds the radius value
-            var height_RectangularColumn = GetHeightDimension?.Invoke() ?? 0; // holds the height 
-            var maxValue = isRectangularSection ? height_RectangularColumn : radius;
-            string dim = "0";
-            string exceediverError = $"Delta Y can't be greater than {dim}";
+            var radius = GetMinimumDimension?.Invoke() ?? 0; // holds the radius
+            var heightRectangularColumn = GetHeightDimension?.Invoke() ?? 0; // holds the height 
+            var stirrupDiameter = GetStirrupDiameter?.Invoke() ?? 0; // holds the Stirrup Diameter 
+            var maxValue = isRectangularSection ? heightRectangularColumn : radius;
+            string exceediverError = "Delta Y can't be greater than boundary";
             string nonPositiveError = "Delta Y should have a positive value only.";
 
             if (isRectangularSection)
-                maxValue -= (2 * Cover + RebarDia); // max delta y considers cover, rebar diameter
+                maxValue -= (2 * cover + RebarDia + 2 * stirrupDiameter); // max delta y considers cover, rebar diameter
             else
-                maxValue -= (Cover + RebarDia);
+                maxValue -= (cover + RebarDia + stirrupDiameter);
 
             if (DeltaY < 0)
             {
-                HasErrors[7] = true;
                 UpdateErrorList(nonPositiveError, true);
                 return "Error";
             }
             else if ((DeltaY != 0) && (DeltaY > maxValue))
             {
-                dim = maxValue.ToString();
-                HasErrors[7] = true;
                 UpdateErrorList(exceediverError, true);
                 return "Error";
             }
             else
             {
-                HasErrors[7] = false;
                 UpdateErrorList(nonPositiveError, false);
                 UpdateErrorList(exceediverError, false);
                 return string.Empty;
@@ -136,19 +133,16 @@ namespace WpfApp1
 
             if (RebarDia <= 0)
             {
-                HasErrors[8] = true;
                 UpdateErrorList(nonPositiveError, true);
                 return "Error";
             }
             else if (RebarDia > minValue)
             {
-                HasErrors[8] = true;
                 UpdateErrorList(exceediverError, true);
                 return "Error";
             }
             else
             {
-                HasErrors[8] = false;
                 UpdateErrorList(nonPositiveError, false);
                 UpdateErrorList(exceediverError, false);
                 return string.Empty;
@@ -158,13 +152,19 @@ namespace WpfApp1
         #endregion
 
         private Func<double> GetMinimumDimension { get; set; }
+        private Func<bool> IsRectangularSection { get; set; }
         private Func<double> GetHeightDimension { get; set; }
+        private Func<double> GetStirrupDiameter { get; set; }
         private Action<string, bool> UpdateErrorList { get; set; }
+        private Func<double> GetCover {  get; set; }
 
-        public void SetCallBcks(Func<double> getMinimumDimension, Func<double> getHeightDimension, Action<string, bool> updateErrorList)
+        public void SetCallBcks(Func<double> getMinimumDimension, Func<double> getHeightDimension, Func<bool> GetIfRectangularSection, Func<double> getCover, Func<double> getStirrupDiameter, Action<string, bool> updateErrorList)
         {
             GetMinimumDimension = getMinimumDimension;
             GetHeightDimension = getHeightDimension;
+            GetStirrupDiameter = getStirrupDiameter;
+            IsRectangularSection = GetIfRectangularSection;
+            GetCover = getCover;
             UpdateErrorList = updateErrorList;
         }
         public Rebars()

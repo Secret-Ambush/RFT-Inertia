@@ -530,7 +530,7 @@
                                         GridLinesVisibility="Vertical"
                                         HeadersVisibility="Column"
                                         IsReadOnly="False"
-                                        ItemsSource="{Binding Entries}"
+                                        ItemsSource="{Binding UserRebarEntries}"
                                         SelectionMode="Single"
                                         Style="{DynamicResource DataGridStyle}">
 
@@ -623,7 +623,7 @@
                                             Margin="0,2,5,2"
                                             Padding="2,2,0,0"
                                             ItemsSource="{Binding SectionTypeOptions, Mode=OneWay}"
-                                            Loaded="section_Loaded"
+                                            SelectedIndex="1"
                                             SelectedItem="{Binding SelectedSection}"
                                             Style="{DynamicResource DefaultComboBoxStyle}" />
                                     </Border>
@@ -917,7 +917,7 @@
                                 </Grid.RowDefinitions>
                                 <GroupBox
                                     Grid.Row="0"
-                                    Margin="0,0,0,10"
+                                    Margin="0,0,0,5"
                                     BorderBrush="{DynamicResource DataGridBorderColor}"
                                     FontWeight="DemiBold"
                                     Foreground="{DynamicResource ForeGroundColor}"
@@ -926,6 +926,7 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="350" />
+                                            <RowDefinition Height="25" />
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Row="0">
                                             <Grid.ColumnDefinitions>
@@ -962,8 +963,18 @@
                                                     Margin="0,-89,0,37"
                                                     Source="Resources/Rectangular-Image.png"
                                                     Visibility="{Binding DisplayRectangleGuideIllustration, Converter={StaticResource booleanToVisibilityConverter}}" />
-
                                             </Grid>
+                                        </Grid>
+                                        <Grid Grid.Row="2">
+                                            <TextBox
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Background="{DynamicResource BackgroundColor}"
+                                                BorderThickness="0"
+                                                FontSize="10"
+                                                Foreground="{DynamicResource ForeGroundColor}"
+                                                IsReadOnly="True"
+                                                Text="{Binding MaxDeltaYMessage}" />
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
@@ -984,6 +995,7 @@
                                     </Expander.Header>
                                     <Expander.Content>
                                         <DataGrid
+                                            Margin="1,1,1,1"
                                             AutoGenerateColumns="False"
                                             Background="#FFE8C5"
                                             ColumnWidth="*"
