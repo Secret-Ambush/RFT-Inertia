@@ -11,15 +11,7 @@ namespace WpfApp1
     {
         public override double[] RebarInertiaCal(double radiusOfColumn, double StirrupThickness, ObservableCollection<Rebars> userInputtedRebars, double cover)
         {
-            double rebarIx = 0;
-            double rebarIy = 0;
-            double totalAreaOfRebars = 0;
-            int countOfOfRebarsInTheWholeSection = 0;
-
-            foreach (var item in userInputtedRebars)
-            {
-                countOfOfRebarsInTheWholeSection+= item.NumOfRebar;
-            }
+            int countOfOfRebarsInTheWholeSection = GetTotalNumberOfRebars(userInputtedRebars);
 
             Coordinates[] rebarsCoordinates = new Coordinates[countOfOfRebarsInTheWholeSection];
 
@@ -31,7 +23,7 @@ namespace WpfApp1
 
                     double areaOfRebar = CalcRebarArea(item.RebarDia);
                     double slice = (2 * Math.PI) / item.NumOfRebar; //radians
-                    
+
                     for (int i = 0; i < item.NumOfRebar; i++)
                     {
                         double angle = slice * i;
@@ -47,19 +39,9 @@ namespace WpfApp1
 
                 }
 
-                if (countOfOfRebarsInTheWholeSection > 2)
-                {
-                    for (int i = 0; i < countOfOfRebarsInTheWholeSection - 1; i++)
-                    {
-                        double diff_x = rebarsCoordinates[i].x_coordinate - rebarsCoordinates[i + 1].x_coordinate;
-                        double diff_y = rebarsCoordinates[i].y_coordinate - rebarsCoordinates[i + 1].y_coordinate;
-                        double sum_radius = rebarsCoordinates[i].radius + rebarsCoordinates[i + 1].radius;
-                        if ((Math.Pow(diff_x, 2) + Math.Pow(diff_y, 2)) < Math.Pow(sum_radius, 2))
-                        {
-                            return [-1, -1, -1];
-                        }
-                    }
-                }
+                if (AreThereOverlappingRebars(rebarsCoordinates, countOfOfRebarsInTheWholeSection))
+                    return [-1, -1, -1];
+
             }
 
             return [Math.Round(rebarIx, 6), Math.Round(rebarIy, 6), Math.Round(totalAreaOfRebars, 6)];
@@ -67,7 +49,7 @@ namespace WpfApp1
 
         public override double[] TotalInertiaCal(double diameterOfColumn)
         {
-            double totalIx = PI * Math.Pow(diameterOfColumn, 4)/64;
+            double totalIx = PI * Math.Pow(diameterOfColumn, 4) / 64;
             double totalIy = PI * Math.Pow(diameterOfColumn, 4) / 64;
 
             return [Math.Round(totalIx, 6), Math.Round(totalIy, 6)];
