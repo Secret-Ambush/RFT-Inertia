@@ -233,7 +233,6 @@
     </Window.Resources>
 
     <Border>
-
         <Grid>
             <Grid.Resources>
                 <ControlTemplate x:Key="windowControls" TargetType="Button">
@@ -248,7 +247,6 @@
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Grid.Resources>
-
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
