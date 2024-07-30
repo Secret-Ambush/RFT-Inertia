@@ -19,7 +19,6 @@ namespace WpfApp1
         private Window mWindow;
 
         private ObservableCollection<Rebars>? _userRebarInput;
-
         private readonly List<string> _sectionTypeOptions = ["Circular Column", "Rectangular Beam", "Rectangular Column"];
         private string _selectedSectionType;
 
