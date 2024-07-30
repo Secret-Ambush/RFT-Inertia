@@ -1,24 +1,18 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Controls;
-using System.Xml.Linq;
-using System.Windows.Shapes;
 using System.Windows.Media;
-using System.Data.Common;
-using HandyControl.Tools.Extension;
-using System.Collections.Generic;
+using System.Windows.Shapes;
 
 namespace WpfApp1
 {
     public class WindowViewModel : BaseViewModel
     {
         #region Private Properties
-
-        private Window mWindow;
+        private readonly string rebarInfoEmpty = "Fill in rebar details";
 
         private ObservableCollection<Rebars>? _userRebarInput;
+
         private readonly List<string> _sectionTypeOptions = ["Circular Column", "Rectangular Beam", "Rectangular Column"];
         private string _selectedSectionType;
 
@@ -80,11 +74,7 @@ namespace WpfApp1
             get { return _stirrupThicknessOptions; }
         }
 
-
         //Commands
-        public ICommand MinimizeCommand { get; set; }
-        public ICommand MaximizeCommand { get; set; }
-        public ICommand CloseCommand { get; set; }
         public ICommand CalculateInertia { get; set; }
         public ICommand ClearAll { get; set; }
 
@@ -189,7 +179,6 @@ namespace WpfApp1
         #endregion
 
         // Obs Collection for Datagrid
-
         public ObservableCollection<Rebars>? UserRebarEntries
         {
             get { return _userRebarInput; }
@@ -248,27 +237,27 @@ namespace WpfApp1
                 OnPropertyChanged(nameof(_isRectangularSection));
             }
         }
-        public bool calCanExecute
+        public bool CalCanExecute
         {
             get => _calcCanExecute;
             set
             {
                 _calcCanExecute = value;
-                OnPropertyChanged(nameof(calCanExecute));
+                OnPropertyChanged(nameof(CalCanExecute));
             }
         }
         public double MaxDeltaYValue
         {
             get => _maxDeltaYValue;
             set
-            { _maxDeltaYValue = value; OnPropertyChanged(nameof(MaxDeltaYValue));}
+            { _maxDeltaYValue = value; OnPropertyChanged(nameof(MaxDeltaYValue)); }
         }
         public string MaxDeltaYMessage
         {
             get => _maxDeltaYString;
             set
             {
-                _maxDeltaYString = value; OnPropertyChanged(nameof(MaxDeltaYMessage));            
+                _maxDeltaYString = value; OnPropertyChanged(nameof(MaxDeltaYMessage));
             }
         }
 
@@ -592,6 +581,11 @@ namespace WpfApp1
         // Public methods
         public void CalculateInertia_Execute()
         {
+            string rebarOverlapError = "Rebars are overlapping. Please check";
+            double[] inertia = [];
+            double[] total = [];
+
+            // Max Delta Y Value
             foreach (var item in UserRebarEntries)
             {
                 if (item.RowCount == UserRebarEntries.Count)
@@ -607,93 +601,64 @@ namespace WpfApp1
                     SetMaxDeltaYMessage(item.RebarDia);
                 }
             }
-            
 
             if (!isRectangularSection)
             {
-                string rebarOverlapError = "Rebars are overlapping. Please check";
-
                 CircularSections c = new CircularSections();
-                double[] inertia = c.RebarInertiaCal(Radius, SelectedStirrupThickness, UserRebarEntries, Cover);
-
-                if (inertia[0] == -1)
-                {
-                    UpdateErrorListBasedOnRebars(rebarOverlapError, true);
-                }
-
-                else
-                {
-                    RebarIx = inertia[0];
-                    RebarIy = inertia[1];
-
-                    AreaOfRebars = inertia[2];
-
-                    RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
-                    RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
-
-                    double[] total = c.TotalInertiaCal(Diameter);
-                    TotalIx = TotalIy = total[0];
-
-                    TotalArea = PI * Math.Pow(Radius, 2);
-
-                    TotalRx = Math.Sqrt(TotalIx / TotalArea);
-                    TotalRy = Math.Sqrt(TotalIy / TotalArea);
-
-                    UpdateErrorListBasedOnRebars(rebarOverlapError, false);
-
-                    DrawRebars();
-                }
-
+                inertia = c.RebarInertiaCal(Radius, SelectedStirrupThickness, UserRebarEntries, Cover);
+                total = c.TotalInertiaCal(Diameter);
             }
 
             else
             {
                 RectangularSections r = new RectangularSections();
-
-                double[] inertia = r.RebarInertiaCal(Breadth, Height, SelectedStirrupThickness, UserRebarEntries, Cover, SideCover);
-                string rebarOverlapError = "Rebars are overlapping. Please check";
-
-                if (inertia[0] == -1)
-                {
-                    UpdateErrorListBasedOnRebars(rebarOverlapError, true);
-                }
-
-                else
-                {
-                    RebarIx = inertia[0];
-                    RebarIy = inertia[1];
-
-                    AreaOfRebars = inertia[2];
-
-                    RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
-                    RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
-
-                    double[] total = r.TotalInertiaCal(Breadth, Height);
-                    TotalIx = TotalIy = total[0];
-
-                    TotalArea = Breadth * Height;
-
-                    TotalRx = Math.Sqrt(TotalIx / TotalArea);
-                    TotalRy = Math.Sqrt(TotalIy / TotalArea);
-
-                    UpdateErrorListBasedOnRebars(rebarOverlapError, false);
-
-                    DrawRebars();
-                }
-
+                inertia = r.RebarInertiaCal(Breadth, Height, SelectedStirrupThickness, UserRebarEntries, Cover, SideCover);
+                total = r.TotalInertiaCal(Breadth, Height);
             }
+
+            if (inertia[0] == -1)
+            {
+                UpdateErrorListBasedOnRebars(rebarOverlapError, true);
+                return;
+            }
+
+            RebarIx = inertia[0];
+            RebarIy = inertia[1];
+            AreaOfRebars = inertia[2];
+
+            RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
+            RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
+
+            
+            TotalIx = TotalIy = total[0];
+            TotalArea = PI * Math.Pow(Radius, 2);
+            TotalRx = Math.Sqrt(TotalIx / TotalArea);
+            TotalRy = Math.Sqrt(TotalIy / TotalArea);
+
+            UpdateErrorListBasedOnRebars(rebarOverlapError, false);
+
+            DrawRebars();
+            
         }
         public bool CalculateInertia_CanExecute()
         {
+            
+
             if (ErrorsVisibility == Visibility.Visible && !(ErrorList.Contains("Rebars are overlapping. Please check")))
             {
-                calCanExecute = false;
+                CalCanExecute = false;
                 return false;
             }
 
-            calCanExecute = true;
-            return true;
+            if (UserRebarEntries.Count == 0)
+            {
+                UpdateErrorListBasedOnRebars(rebarInfoEmpty, true);
+                CalCanExecute = false;
+                return false;
+            }
 
+            CalCanExecute = true;
+            return true;
         }
         public void ClearContentUponSelection()
         {
@@ -724,33 +689,14 @@ namespace WpfApp1
             }
         }
 
-
         #endregion
 
-        #region Constructors
+        #region Constructor
         public WindowViewModel(Window window)
         {
-            mWindow = window;
-
-            MinimizeCommand = new RelayCommand(() => mWindow.WindowState = WindowState.Minimized);
-            MaximizeCommand = new RelayCommand(() =>
-            {
-                if (mWindow.WindowState != WindowState.Maximized)
-                {
-                    Image = "Images/norm.jpg";
-                    mWindow.WindowState = WindowState.Maximized;
-                }
-                else
-                {
-                    Image = "Images/full.jpg";
-                    mWindow.WindowState = WindowState.Normal;
-                }
-            });
-            CloseCommand = new RelayCommand(() => mWindow.Close());
-
             CalculateInertia = new RelayCommand(() => CalculateInertia_Execute(), CalculateInertia_CanExecute);
 
-            SelectedSection =  SectionTypeOptions[1];
+            SelectedSection = SectionTypeOptions[1];
 
             SelectedStirrupThickness = StirrupThicknessOptions[0];
 
@@ -768,10 +714,6 @@ namespace WpfApp1
             UserRebarEntries.CollectionChanged += OnUserRebarEntriesCollectionChanged;
 
             RebarsForCanvas = new ObservableCollection<Shape>();
-        }
-
-        public WindowViewModel()
-        {
         }
 
         #endregion
@@ -959,10 +901,12 @@ namespace WpfApp1
             if (MaxDeltaYValue == 0)
                 MaxDeltaYMessage = string.Empty;
             else
-                MaxDeltaYMessage = $"Max Delta Y value: {MaxDeltaYValue}mm \nIf Rebars of Diameter {rebarDia}mm are used throughout"; 
+                MaxDeltaYMessage = $"Max Delta Y value: {MaxDeltaYValue}mm \nIf Rebars of Diameter {rebarDia}mm are used throughout";
         }
         private void OnUserRebarEntriesCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            UpdateErrorListBasedOnRebars(rebarInfoEmpty, false);
+
             foreach (var item in UserRebarEntries)
             {
                 item.RowCount = UserRebarEntries.IndexOf(item) + 1;
