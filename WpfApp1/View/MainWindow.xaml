@@ -11,7 +11,7 @@
     xmlns:vm="clr-namespace:WpfApp1"
     x:Name="AppWindow"
     Title="Inertia Calculator"
-    Width="1000"
+    Width="950"
     Height="700"
     MinWidth="400"
     MinHeight="400"
@@ -135,21 +135,6 @@
     <Border>
 
         <Grid>
-            <Grid.Resources>
-                <ControlTemplate x:Key="windowControls" TargetType="Button">
-                    <Grid>
-                        <ContentPresenter x:Name="buttons" Opacity="0.7" />
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="buttons" Property="Opacity" Value="1" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Grid.Resources>
-
-
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -263,6 +248,7 @@
                                         <RowDefinition Height="30" />
                                         <RowDefinition Height="30" />
                                         <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
                                     </Grid.RowDefinitions>
 
                                     <!--  Labels in Column 0 of Inner Grid  -->
@@ -349,128 +335,143 @@
                                         Foreground="{DynamicResource ForeGroundColor}"
                                         Visibility="{Binding isRectangularSection, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource inversebooleanToVisibilityConverter}}" />
 
-                                    <Grid
+                                    <GroupBox
                                         Grid.Row="9"
-                                        Grid.RowSpan="5"
+                                        Grid.RowSpan="6"
                                         Grid.Column="0"
-                                        Margin="0,2,0,0">
-
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                        </Grid.RowDefinitions>
-
-
-                                        <TextBlock
-                                            Grid.Row="0"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontFamily="{StaticResource ProductSans}"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Rebar Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Rebar
-                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
-                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="2"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontFamily="{StaticResource ParadiseLove}"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Rebar
-                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
-                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="3"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Rebar
-                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
-                                            (mm)</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="4"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Rebar
-                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
-                                            (mm)</TextBlock>
+                                        Background="{DynamicResource DataGridBackgroundColor}"
+                                        BorderBrush="{DynamicResource DataGridBorderColor}"
+                                        Foreground="{DynamicResource ForeGroundColor}"
+                                        Header="Rebar Properties">
+                                        <Grid Margin="0,2,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                            </Grid.RowDefinitions>
 
 
-                                        <TextBox
-                                            x:Name="RA"
-                                            Grid.Row="0"
-                                            Grid.Column="1"
-                                            Margin="0,2,0,2"
-                                            Padding="5"
-                                            FontFamily="{StaticResource ProductSans}"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding AreaOfRebars}" />
-                                        <TextBox
-                                            x:Name="RIY"
-                                            Grid.Row="1"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            Padding="5"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding RebarIx}" />
-                                        <TextBox
-                                            x:Name="RIX"
-                                            Grid.Row="2"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            Padding="5"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding RebarIy}" />
-                                        <TextBox
-                                            x:Name="RRX"
-                                            Grid.Row="3"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            Padding="5"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding RebarRadiusX}" />
-                                        <TextBox
-                                            x:Name="RRY"
-                                            Grid.Row="4"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            Padding="5"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding RebarRadiusY}" />
+                                            <TextBlock
+                                                Grid.Row="0"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource ProductSans}"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Rebar Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Rebar
+                                                I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                                (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="2"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource ParadiseLove}"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Rebar
+                                                I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                                (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="3"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Rebar
+                                                r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                                (mm)</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="4"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Rebar
+                                                r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                                (mm)</TextBlock>
 
-                                    </Grid>
+
+                                            <TextBox
+                                                x:Name="RA"
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                Margin="0,2,0,2"
+                                                Padding="5"
+                                                Background="LightGray"
+                                                FontFamily="{StaticResource ProductSans}"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding AreaOfRebars}" />
+                                            <TextBox
+                                                x:Name="RIY"
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Padding="5"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding RebarIx}" />
+                                            <TextBox
+                                                x:Name="RIX"
+                                                Grid.Row="2"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Padding="5"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding RebarIy}" />
+                                            <TextBox
+                                                x:Name="RRX"
+                                                Grid.Row="3"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Padding="5"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding RebarRadiusX}" />
+                                            <TextBox
+                                                x:Name="RRY"
+                                                Grid.Row="4"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Padding="5"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding RebarRadiusY}" />
+
+                                        </Grid>
+                                    </GroupBox>
+
 
 
                                     <!--  Table in Column 0 of Inner Grid  -->
@@ -495,7 +496,7 @@
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Width="55"
-                                                Binding="{Binding RowCount, ValidatesOnDataErrors=True}"
+                                                Binding="{Binding RowCount, ValidatesOnDataErrors=True, Mode=TwoWay}"
                                                 IsReadOnly="True">
                                                 <DataGridTextColumn.Header>
                                                     <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
@@ -505,7 +506,7 @@
                                             </DataGridTextColumn>
 
                                             <!--  Rebar Diameter  -->
-                                            <DataGridTextColumn Width="*" Binding="{Binding RebarDia, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}">
+                                            <DataGridTextColumn Width="*" Binding="{Binding RebarDia, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True, Mode=TwoWay}">
                                                 <DataGridTextColumn.Header>
                                                     <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
                                                         <TextBlock HorizontalAlignment="Center" Text="Rebar Diameter" />
@@ -516,7 +517,7 @@
 
 
                                             <!--  Number of Rebars  -->
-                                            <DataGridTextColumn Width="*" Binding="{Binding NumOfRebar, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True}">
+                                            <DataGridTextColumn Width="*" Binding="{Binding NumOfRebar, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True, Mode=TwoWay}">
                                                 <DataGridTextColumn.Header>
                                                     <StackPanel Orientation="Vertical">
                                                         <TextBlock HorizontalAlignment="Center" Text="Number of" />
@@ -526,7 +527,7 @@
                                             </DataGridTextColumn>
 
                                             <!--  Delta Y or Spacing or chuck  -->
-                                            <DataGridTextColumn Width="*" Binding="{Binding DeltaY, ValidatesOnDataErrors=True}">
+                                            <DataGridTextColumn Width="*" Binding="{Binding DeltaY, UpdateSourceTrigger=LostFocus, ValidatesOnDataErrors=True, Mode=TwoWay}">
                                                 <DataGridTextColumn.Header>
                                                     <TextBlock
                                                         HorizontalAlignment="Center"
@@ -572,8 +573,7 @@
                                     <!--  Controls in Column 2  -->
                                     <Border
                                         Grid.Row="1"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         CornerRadius="2">
                                         <ComboBox
                                             x:Name="section"
@@ -589,8 +589,7 @@
                                     <!--  Input fields for rectangular sections  -->
                                     <Border
                                         Grid.Row="2"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
@@ -602,8 +601,7 @@
                                     </Border>
                                     <Border
                                         Grid.Row="3"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
@@ -617,43 +615,32 @@
                                     <!--  Input field for circular column  -->
                                     <Border
                                         Grid.Row="2"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
                                         <TextBox
-                                            x:Name="Radius"
                                             Padding="2,2,0,0"
                                             Style="{DynamicResource TextBoxStyle}"
                                             Text="{Binding Radius, ValidatesOnDataErrors=True, Mode=TwoWay}" />
                                     </Border>
                                     <Border
                                         Grid.Row="3"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
                                         <TextBox
-                                            x:Name="RebarDia"
                                             Padding="2,2,0,0"
+                                            Background="LightGray"
+                                            Foreground="Black"
                                             Style="{DynamicResource TextBoxStyle}"
                                             Text="{Binding Diameter, ValidatesOnDataErrors=True}" />
                                     </Border>
 
-                                    <!-- Alternate Style
-        <Border Visibility="{Binding isRectangularSection,
-            Converter={StaticResource inversebooleanToVisibilityConverter}}" Margin="0,15,0,15"
-                Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2" BorderThickness="0">
-            <TextBox IsReadOnly="True" Padding="2 2 0 0" Margin="0,0,5,0"/>
-        </Border>
-                                    -->
-
                                     <Border
                                         Grid.Row="4"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0">
                                         <TextBox
@@ -665,8 +652,7 @@
                                     <!--  Side Cover for rectangular  -->
                                     <Border
                                         Grid.Row="5"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         BorderThickness="0"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
@@ -679,8 +665,7 @@
 
                                     <Border
                                         Grid.Row="6"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         CornerRadius="2"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource booleanToVisibilityConverter}}">
@@ -715,8 +700,7 @@
 
                                     <Border
                                         Grid.Row="5"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.Column="2"
                                         Margin="0,2,5,2"
                                         CornerRadius="2"
                                         Visibility="{Binding isRectangularSection, Converter={StaticResource inversebooleanToVisibilityConverter}}">
@@ -749,119 +733,134 @@
                                         </ListBox>
                                     </Border>
 
-                                    <!--  Labels in Column 2 of Inner Grid  -->
-                                    <Grid
+                                    <GroupBox
                                         Grid.Row="9"
-                                        Grid.RowSpan="5"
+                                        Grid.RowSpan="7"
                                         Grid.Column="2"
-                                        Margin="0,2,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="30" />
-                                        </Grid.RowDefinitions>
+                                        Background="{DynamicResource DataGridBackgroundColor}"
+                                        BorderBrush="{DynamicResource DataGridBorderColor}"
+                                        Foreground="{DynamicResource ForeGroundColor}"
+                                        Header="Section Properties">
+                                        <!--  Labels in Column 2 of Inner Grid  -->
+                                        <Grid Margin="0,2,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                            </Grid.RowDefinitions>
 
-                                        <TextBlock
-                                            Grid.Row="0"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontFamily="{StaticResource ProductSans}"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Total Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Total
-                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
-                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="2"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Total
-                                            I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
-                                            (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
-                                            )</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="3"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Total
-                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
-                                            (mm)</TextBlock>
-                                        <TextBlock
-                                            Grid.Row="4"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Foreground="{DynamicResource ForeGroundColor}">
-                                            Total
-                                            r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
-                                            (mm)</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="0"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource ProductSans}"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Total Area (mm<Run BaselineAlignment="TextTop" FontSize="7pt">2</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Total
+                                                I<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                                (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="2"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Total
+                                                I<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                                (mm<Run BaselineAlignment="TextTop" FontSize="7pt">4</Run>
+                                                )</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="3"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Total
+                                                r<Run BaselineAlignment="TextBottom" FontSize="7pt">x</Run>
+                                                (mm)</TextBlock>
+                                            <TextBlock
+                                                Grid.Row="4"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Foreground="{DynamicResource ForeGroundColor}">
+                                                Total
+                                                r<Run BaselineAlignment="TextBottom" FontSize="7pt">y</Run>
+                                                (mm)</TextBlock>
 
-                                        <TextBox
-                                            x:Name="TA"
-                                            Grid.Row="0"
-                                            Grid.Column="1"
-                                            Margin="0,2,0,2"
-                                            FontFamily="{StaticResource ProductSans}"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding TotalArea}" />
-                                        <TextBox
-                                            x:Name="TIX"
-                                            Grid.Row="1"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding TotalIx}" />
-                                        <TextBox
-                                            x:Name="TIY"
-                                            Grid.Row="2"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding TotalIy}" />
-                                        <TextBox
-                                            x:Name="TRX"
-                                            Grid.Row="3"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding TotalRx}" />
-                                        <TextBox
-                                            x:Name="TRY"
-                                            Grid.Row="4"
-                                            Grid.Column="1"
-                                            Margin="0,0,0,2"
-                                            IsReadOnly="True"
-                                            Style="{DynamicResource TextBoxStyle}"
-                                            Text="{Binding TotalRy}" />
-                                    </Grid>
+                                            <TextBox
+                                                x:Name="TA"
+                                                Grid.Row="0"
+                                                Grid.Column="1"
+                                                Margin="0,2,0,2"
+                                                Background="LightGray"
+                                                FontFamily="{StaticResource ProductSans}"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding TotalArea}" />
+                                            <TextBox
+                                                x:Name="TIX"
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding TotalIx}" />
+                                            <TextBox
+                                                x:Name="TIY"
+                                                Grid.Row="2"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding TotalIy}" />
+                                            <TextBox
+                                                x:Name="TRX"
+                                                Grid.Row="3"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding TotalRx}" />
+                                            <TextBox
+                                                x:Name="TRY"
+                                                Grid.Row="4"
+                                                Grid.Column="1"
+                                                Margin="0,0,0,2"
+                                                Background="LightGray"
+                                                Foreground="Black"
+                                                IsReadOnly="True"
+                                                Style="{DynamicResource TextBoxStyle}"
+                                                Text="{Binding TotalRy}" />
+                                        </Grid>
+                                    </GroupBox>
 
                                 </Grid>
                             </GroupBox>
@@ -891,15 +890,16 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <Image
-                                                Grid.Column="1"
-                                                Margin="3,-22,-4,-29"
+                                                Grid.ColumnSpan="2"
+                                                Margin="159,-7,-16,-31"
                                                 Source="Resources/Circular-Image.png"
                                                 Visibility="{Binding DisplaySmallCircleGuide, Converter={StaticResource booleanToVisibilityConverter}}" />
                                             <Image
                                                 Grid.ColumnSpan="2"
-                                                Margin="173,-18,-24,-30"
+                                                Margin="150,-9,-45,-18"
                                                 Source="Resources/Rectangular-Image.png"
                                                 Visibility="{Binding DisplaySmallRectangleGuide, Converter={StaticResource booleanToVisibilityConverter}}" />
+
                                         </Grid>
                                         <Grid Grid.Row="1">
                                             <Canvas x:Name="myCanvas">
