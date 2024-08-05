@@ -16,7 +16,7 @@ namespace WpfApp1
         private readonly List<string> _sectionTypeOptions = ["Circular Column", "Rectangular Beam", "Rectangular Column"];
         private string _selectedSectionType;
 
-        private List<double> _stirrupThicknessOptions = [4, 6, 8, 10, 12];
+        private List<double> _stirrupThicknessOptions = [8, 10, 12, 16, 18, 20];
         private double _selectedStirrupThickness;
 
         private ObservableCollection<string> _errorList = new ObservableCollection<string>();
@@ -131,7 +131,6 @@ namespace WpfApp1
                 _sidecover = value; OnPropertyChanged(nameof(SideCover));
             }
         }
-
         public string SelectedSection
         {
             get { return _selectedSectionType; }
@@ -149,6 +148,7 @@ namespace WpfApp1
                             DisplaySmallRectangleGuide = false;
                             DisplaySmallCircleGuide = false;
                             ClearContentUponSelection();
+                            GetDefaultValuesRectangle();
 
                             break;
                         }
@@ -160,6 +160,7 @@ namespace WpfApp1
                             DisplaySmallRectangleGuide = false;
                             DisplaySmallCircleGuide = false;
                             ClearContentUponSelection();
+                            GetDefaultValuesCircle();
 
                             break;
                         }
@@ -190,7 +191,7 @@ namespace WpfApp1
             }
         }
 
-        // List of Validation Errors
+        // List of Validation Errors + Error List
         private Visibility _errorsVisibility = Visibility.Visible;
         public Visibility ErrorsVisibility
         {
@@ -521,7 +522,7 @@ namespace WpfApp1
                 double corner_x = margin_left;
                 double corner_y = margin_top;
 
-                //Adding Rebars
+                //Adding Rebars + Stirrups
                 foreach (var item in UserRebarEntries)
                 {
                     int numberOfRebars = item.NumOfRebar;
@@ -588,7 +589,7 @@ namespace WpfApp1
             // Max Delta Y Value
             foreach (var item in UserRebarEntries)
             {
-                if (item.RowCount == UserRebarEntries.Count)
+                if (item.RowCount == 1)
                 {
                     var maxValue = isRectangularSection ? Height : Radius;
 
@@ -599,6 +600,8 @@ namespace WpfApp1
 
                     MaxDeltaYValue = maxValue;
                     SetMaxDeltaYMessage(item.RebarDia);
+
+                    break;
                 }
             }
 
@@ -607,6 +610,7 @@ namespace WpfApp1
                 CircularSections c = new CircularSections();
                 inertia = c.RebarInertiaCal(Radius, SelectedStirrupThickness, UserRebarEntries, Cover);
                 total = c.TotalInertiaCal(Diameter);
+                TotalArea = Math.Round(PI * Math.Pow(Radius, 2),1);
             }
 
             else
@@ -614,6 +618,7 @@ namespace WpfApp1
                 RectangularSections r = new RectangularSections();
                 inertia = r.RebarInertiaCal(Breadth, Height, SelectedStirrupThickness, UserRebarEntries, Cover, SideCover);
                 total = r.TotalInertiaCal(Breadth, Height);
+                TotalArea = Math.Round(Height * Breadth,1);
             }
 
             if (inertia[0] == -1)
@@ -622,18 +627,18 @@ namespace WpfApp1
                 return;
             }
 
-            RebarIx = inertia[0];
-            RebarIy = inertia[1];
-            AreaOfRebars = inertia[2];
+            RebarIx = Math.Round(inertia[0],1);
+            RebarIy = Math.Round(inertia[1],1);
+            AreaOfRebars = Math.Round(inertia[2],1);
 
-            RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 6);
-            RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 6);
+            RebarRadiusX = Math.Round(Math.Sqrt(RebarIx / AreaOfRebars), 1);
+            RebarRadiusY = Math.Round(Math.Sqrt(RebarIy / AreaOfRebars), 1);
 
             
-            TotalIx = TotalIy = total[0];
-            TotalArea = PI * Math.Pow(Radius, 2);
-            TotalRx = Math.Sqrt(TotalIx / TotalArea);
-            TotalRy = Math.Sqrt(TotalIy / TotalArea);
+            TotalIx = TotalIy = Math.Round(total[0],1);
+            
+            TotalRx = Math.Round(Math.Sqrt(TotalIx / TotalArea),1);
+            TotalRy = Math.Round(Math.Sqrt(TotalIy / TotalArea),1);
 
             UpdateErrorListBasedOnRebars(rebarOverlapError, false);
 
@@ -642,8 +647,6 @@ namespace WpfApp1
         }
         public bool CalculateInertia_CanExecute()
         {
-            
-
             if (ErrorsVisibility == Visibility.Visible && !(ErrorList.Contains("Rebars are overlapping. Please check")))
             {
                 CalCanExecute = false;
@@ -681,11 +684,19 @@ namespace WpfApp1
 
             if (isRectangularSection)
             {
-                ValidateBreadth(); ValidateHeight(); ValidateCover(); ValidateSideCover();
+                ValidateBreadth(); ValidateHeight(); ValidateCover(); ValidateSideCover(); 
+                DisplayRectangleGuideIllustration = true;
+                DisplayCircleGuideIllustration = false;
+                DisplaySmallRectangleGuide = false;
+                DisplaySmallCircleGuide = false;
             }
             else
             {
                 ValidateRadius(); ValidateDiameter(); ValidateCover();
+                DisplayRectangleGuideIllustration = false;
+                DisplayCircleGuideIllustration = true;
+                DisplaySmallRectangleGuide = false;
+                DisplaySmallCircleGuide = false;
             }
         }
 
@@ -695,10 +706,6 @@ namespace WpfApp1
         public WindowViewModel(Window window)
         {
             CalculateInertia = new RelayCommand(() => CalculateInertia_Execute(), CalculateInertia_CanExecute);
-
-            SelectedSection = SectionTypeOptions[1];
-
-            SelectedStirrupThickness = StirrupThicknessOptions[0];
 
             MaxDeltaYMessage = string.Empty;
 
@@ -714,6 +721,10 @@ namespace WpfApp1
             UserRebarEntries.CollectionChanged += OnUserRebarEntriesCollectionChanged;
 
             RebarsForCanvas = new ObservableCollection<Shape>();
+            
+            SelectedStirrupThickness = StirrupThicknessOptions[0];
+            SelectedSection = SectionTypeOptions[1];
+
         }
 
         #endregion
@@ -919,6 +930,33 @@ namespace WpfApp1
                 ErrorsVisibility = Visibility.Visible;
             else
                 ErrorsVisibility = Visibility.Collapsed;
+        }
+        private void GetDefaultValuesRectangle()
+        {
+            Height = 300;
+            Breadth = 400;
+            Cover = 20;
+            SideCover = 30;
+            SelectedStirrupThickness = StirrupThicknessOptions[0];
+
+            UserRebarEntries.RemoveAt(0);
+            UserRebarEntries.Add(new Rebars(20, 2, 0));
+            UserRebarEntries.Add(new Rebars(20, 2, 224));
+
+            CalculateInertia_Execute();
+        }
+
+        private void GetDefaultValuesCircle()
+        {
+            Radius = 100;
+            Diameter = 200;
+            Cover = 10;
+            SelectedStirrupThickness = StirrupThicknessOptions[0];
+
+            UserRebarEntries.RemoveAt(0);
+            UserRebarEntries.Add(new Rebars(10, 4, 0));
+
+            CalculateInertia_Execute();
         }
 
         #endregion
