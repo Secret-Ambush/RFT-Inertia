@@ -725,6 +725,13 @@ namespace WpfApp1
             SelectedStirrupThickness = StirrupThicknessOptions[0];
             SelectedSection = SectionTypeOptions[1];
 
+            new ToastContentBuilder()
+                .AddArgument("action", "viewConversation")
+                .AddArgument("conversationId", 9813)
+                .AddText("WPF APP 😃")
+                .AddText("Calculate inertia and visualise rebars in a column!")
+                .Show();
+
         }
 
         #endregion
