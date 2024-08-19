@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow
+<mah:MetroWindow
     x:Class="WpfApp1.ReportWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,24 +6,27 @@
     xmlns:local="clr-namespace:WpfApp1"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="ReportPreviewWindow"
     Title="Report Preview"
-    Width="600"
+    Width="700"
     Height="700"
     Icon="Resources/logo.png"
     ResizeMode="NoResize"
     ShowMaxRestoreButton="False"
     ShowMinButton="False"
     WindowStartupLocation="CenterScreen"
+    WindowTitleBrush="ForestGreen"
     mc:Ignorable="d">
 
     <Grid Background="#F0EBE3">
-        <Grid>
-            <ToolBar HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Button Click="Button_Click" Content="Download PDF" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ToolBarTray Grid.Row="0">
+            <ToolBar>
+                <Button Click="Button_Click" Content="Download as PDF" />
             </ToolBar>
-            <Image x:Name="ImagePreview" Stretch="Uniform" />
-            <!--<WebBrowser Name="WebBrowserPreview" Margin="0,30,0,0" />-->
-        </Grid>
+        </ToolBarTray>
+        <DocumentViewer Name="documentViewer" Grid.Row="1" />
     </Grid>
 </mah:MetroWindow>
