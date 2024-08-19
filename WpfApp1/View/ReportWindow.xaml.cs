@@ -1,91 +1,66 @@
-﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using System.IO;
+using System.IO.Packaging;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
-using PdfiumViewer;
-using System.Drawing.Imaging;
-using System.Windows.Media.Imaging;
+using System.Windows.Xps.Packaging;
 
 namespace WpfApp1
 {
     public partial class ReportWindow : MetroWindow
     {
         public DocumentConverter _documentConverter;
-
+        private string tempFilePath;
         List<Visual> visual = null;
         byte[] pdfData = null;
 
         public ReportWindow(List<Visual> MainWindowVisuals)
         {
             InitializeComponent();
-            _documentConverter = new DocumentConverter();
 
+            _documentConverter = new DocumentConverter();
             visual = MainWindowVisuals;
             var pageSize = new Size(800, 1000);
+            var paginator = new MyDocumentPaginator(visual, pageSize, false);
+            pdfData = _documentConverter.ConvertToPdf(paginator, pageSize);
 
-
-            var paginator = new MyDocumentPaginator(visual, new Size(800, 1000), false);
-            pdfData = _documentConverter.ConvertToPdf(paginator, new Size(800, 1000));
-            //ShowPdfPreview(pdfData);
-
-            // string htmlPreview = GenerateHtmlPreview(visual, pageSize);
-            //WebBrowserPreview.NavigateToString(htmlPreview);
+            if (pdfData != null)
+            {
+                DisplayXpsDocument(pdfData);
+            }
+            else
+            {
+                MessageBox.Show("Failed to load byte array.");
+            }
 
         }
 
-        private string GenerateHtmlPreview(List<Visual> visuals, Size pageSize)
+        private FixedDocumentSequence GetFixedDocumentSequence(byte[] xpsBytes)
         {
-            var htmlBuilder = new System.Text.StringBuilder();
+            Uri packageUri;
+            XpsDocument xpsDocument = null;
 
-            htmlBuilder.Append("<html><body>");
-
-            foreach (var visual in visuals)
+            using (MemoryStream xpsStream = new MemoryStream(xpsBytes))
             {
-                if (visual is FrameworkElement element)
+                using (Package package = Package.Open(xpsStream))
                 {
-                    string htmlElement = ConvertVisualToHtml(element);
-                    htmlBuilder.Append(htmlElement);
+                    packageUri = new Uri("xpsStream://myXps.xps");
+                    PackageStore.AddPackage(packageUri, package);
+
+                    try
+                    {
+                        xpsDocument = new XpsDocument(package, CompressionOption.Maximum, packageUri.AbsoluteUri);
+                        return xpsDocument.GetFixedDocumentSequence();
+                    }
+                    finally
+                    {
+                        xpsDocument?.Close();
+                        PackageStore.RemovePackage(packageUri);
+                    }
                 }
             }
-
-            htmlBuilder.Append("</body></html>");
-
-            return htmlBuilder.ToString();
-        }
-        private string ConvertVisualToHtml(FrameworkElement element)
-        {
-            if (element is Grid grid)
-            {
-                return $"<div style='width:{grid.ActualWidth}px;height:{grid.ActualHeight}px;background-color:lightgray;'>Grid content here</div>";
-            }
-            else if (element is Canvas canvas)
-            {
-                return $"<div style='width:{canvas.ActualWidth}px;height:{canvas.ActualHeight}px;background-color:lightblue;'>Canvas content here</div>";
-            }
-
-            return $"<div>Unsupported element type: {element.GetType().Name}</div>";
-
-        }
-        private void ShowPdfPreview(byte[] pdfBytes)
-        {
-            using (Stream stream = new MemoryStream(pdfBytes))
-            using (var document = PdfDocument.Load(stream))
-            {
-                var image = document.Render(0, 300, 300, true);
-                string tempImagePath = Path.Combine(Path.GetTempPath(), "pdf_preview.png");
-                DisplayImage(tempImagePath);
-            }
-        }
-        private void DisplayImage(string imagePath)
-        {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(imagePath);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            ImagePreview.Source = bitmap;
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -101,7 +76,35 @@ namespace WpfApp1
                 File.WriteAllBytes(saveFileDialog.FileName, pdfData);
             }
         }
+        private void DisplayXpsDocument(byte[] byteArray)
+        {
+            // Create a temporary file to store the XPS document
+            tempFilePath = Path.GetTempFileName();
+            File.WriteAllBytes(tempFilePath, byteArray);
+            XpsDocument xpsDocument = new XpsDocument(tempFilePath, FileAccess.Read);
+            documentViewer.Document = xpsDocument.GetFixedDocumentSequence();
 
+            // NOTE: Do not close the XpsDocument immediately, it must remain open for the DocumentViewer to function
+            _xpsDocument = xpsDocument;
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
 
+            // Clean up the temporary file and resources
+            if (_xpsDocument != null)
+            {
+                _xpsDocument.Close();
+                _xpsDocument = null;
+            }
+
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+        }
+
+        private XpsDocument _xpsDocument;
     }
 }
+
