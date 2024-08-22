@@ -10,23 +10,14 @@
     Width="700"
     Height="700"
     Icon="Resources/logo.png"
-    ResizeMode="NoResize"
-    ShowMaxRestoreButton="False"
+    ResizeMode="CanResizeWithGrip"
+    ShowMaxRestoreButton="True"
     ShowMinButton="False"
     WindowStartupLocation="CenterScreen"
     WindowTitleBrush="ForestGreen"
     mc:Ignorable="d">
 
     <Grid Background="#F0EBE3">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <ToolBarTray Grid.Row="0">
-            <ToolBar>
-                <Button Click="Button_Click" Content="Download as PDF" />
-            </ToolBar>
-        </ToolBarTray>
-        <DocumentViewer Name="documentViewer" Grid.Row="1" />
+        <DocumentViewer Name="documentViewer" />
     </Grid>
 </mah:MetroWindow>
