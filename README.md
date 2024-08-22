@@ -7,4 +7,4 @@ PropertyChanged.Fody
 System.Drawing.Common  
 Jacobs.Orchestra.UI
 
-![image](./Screenshots/Report Panel.png)
+![image](./Screenshots/Report_Panel.png)
